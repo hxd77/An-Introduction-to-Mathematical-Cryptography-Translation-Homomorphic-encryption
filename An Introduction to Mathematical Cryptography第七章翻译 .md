@@ -604,7 +604,7 @@ _Proof._ 充分性是容易证的，首先格 $L$ 是 $\mathbb{R}^m$ 的加法�
 $$
 \mathcal{F}(v_1,\dots,v_n)=\{t_1v_1+t_2v_2+\dots+t_nv_n:\ 0\leq t_i<1 \}\\
 $$
-下图展示了一个2维格上的基本域。
+下图展示了一个2维格上的基本域，其实基本域就是下面阴影部分中的任何一条从原点出发的向量。
 
 ![image-20250912223525882](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20250912223525882.png)
 
@@ -614,14 +614,14 @@ $$
 
 
 
-**Proposition.** 设$L\subset \mathbb{R}^n$ 是 $n$ 维 格，令 $\mathcal{F}$ 是 $L$ 的基本域。则每一个向量 $w\in \mathbb{R}^n$ 都可以被写成如下形式：
+**Proposition 7.18.** 设$L\subset \mathbb{R}^n$ 是 $n$ 维格，令 $\mathcal{F}$ 是 $L$ 的基本域。则每一个向量 $w\in \mathbb{R}^n$ 都可以被写成如下形式：
 $$
-w = t+v\quad \text{for a unique}\ t \in \mathcal{F}\ \text{and a unique}\ v \in L\\
+w = \boldsymbol{t}+\boldsymbol{v}\quad \text{对一个独一无二的}\ \boldsymbol{t} \in \mathcal{F}\ \text{和一个独一无二的}\ \boldsymbol{v} \in L\\
 $$
-等价来说，当 $v$ 遍历格 $L$ 中的向量时，平移后的基本域(the translated fundamental domains)的并集：
+等价来说，当 $\boldsymbol{v}$ 遍历格 $L$ 中的向量时，平移后的基本域(the translated fundamental domains)的并集：
 
 $$
-\mathcal{F}+v = \{t+v:\ t \in \mathcal{F}\}\\
+\mathcal{F}+\boldsymbol{v}= \{\boldsymbol{t}+\boldsymbol{v}:\boldsymbol{t} \in \mathcal{F}\}\\
 $$
 恰好覆盖整个 $\mathbb{R}^n$. 下图展示了经过 $L$ 中的向量平移后的基本域 $\mathcal{F}$ 恰好覆盖了整个 $\mathbb{R}^n$.
 
@@ -681,7 +681,7 @@ $$
 
 
 
-**Proposition (Hadamard 不等式).** 令 $L$ 是一个 格，取 $L$ 任意的一组基 $v_1,\dots,v_n$, 且 $\mathcal{F}$ 是 $L$ 的一个基本域，则有
+**Proposition 7.19 (Hadamard 不等式).** 令 $L$ 是一个 格，取 $L$ 任意的一组基 $v_1,\dots,v_n$, 且 $\mathcal{F}$ 是 $L$ 的一个基本域，则有
 $$
 \det(L) = \text{Vol}(\mathcal{F}) \leq \left\lVert v_1 \right\rVert \left\lVert v_2 \right\rVert \dots \left\lVert v_n \right\rVert\\
 $$
@@ -852,65 +852,80 @@ $$
 \left\lVert v_1\right\rVert\left\lVert v_2\right\rVert\dots\left\lVert v_n\right\rVert\leq n^{n/2}(\det(L))\\
 $$
 
-> 这个证明我能想到的就是利用 Minkowski 第二定理来直接得到，Minkowski 定理将在后面介
+> 这个证明我能想到的就是利用 Minkowski 第二定理来直接得到，Minkowski 定理将在后面介绍
 
-结合 Hadamard 不等式：$\left\lVert v_1\right\rVert\left\lVert v_2\right\rVert\dots\left\lVert v_n\right\rVert \geq \det(L)$，可以得到：
+结合 Hadamard 不等式（定义7.19）：$\left\lVert v_1\right\rVert\left\lVert v_2\right\rVert\dots\left\lVert v_n\right\rVert \geq \det(L)$，可以得到：
 
-$\frac{1}{\sqrt{n}} \leq \left( \frac{\det(L)}{\left\lVert v_1\right\rVert\left\lVert v_2\right\rVert\dots\left\lVert v_n\right\rVert}\right)^{1/n} \leq 1\\$
-
+$$
+\frac{1}{\sqrt{n}} \leq \left( \frac{\det(L)}{\left\lVert v_1\right\rVert\left\lVert v_2\right\rVert\dots\left\lVert v_n\right\rVert}\right)^{1/n} \leq 1\\
+$$
 定义基底 $\mathcal{B}=\{v_1,\dots,v_n\}$ 的 Hadamard 比率(Hadamard ratio)为：
 
-$\mathcal{H}(\mathcal{B})=\left( \frac{\det(L)}{\left\lVert v_1\right\rVert\left\lVert v_2\right\rVert\dots\left\lVert v_n\right\rVert}\right)^{1/n}\\$
-
-因此 $0<\mathcal{H}(\mathcal{B})\leq 1$，且比值越接近于1，基底向量越趋向于正交(其实就是 Hadamard 不等式的结论)。Hadamard 比率的倒数有时被称为[正交性缺陷](https://zhida.zhihu.com/search?content_id=243052117&content_type=Article&match_order=1&q=%E6%AD%A3%E4%BA%A4%E6%80%A7%E7%BC%BA%E9%99%B7&zhida_source=entity)(orthogonality defect)。
+$$
+\mathcal{H}(\mathcal{B})=\left( \frac{\det(L)}{\left\lVert v_1\right\rVert\left\lVert v_2\right\rVert\dots\left\lVert v_n\right\rVert}\right)^{1/n}\\
+$$
+因此 $0<\mathcal{H}(\mathcal{B})\leq 1$，且比值越接近于1，基底向量越趋向于正交(其实就是 Hadamard 不等式的结论)。Hadamard 比率的倒数有时被称为正交性缺陷(orthogonality defect)。
 
 Hermite 定理的证明利用了 Minkowski 定理，我们将在后面介绍。为了介绍 Minkowski 定理，我们引入一个有用的符号表示法并给出一些基本定义。
 
+
+
 **Definition.** 对于任意的 $a \in \mathbb{R}^n$ 和任意的 $R >0$，以 $a$ 为中心，半径为 $R$ 的(闭)球(closed ball)是集合：
 
-$\mathbb{B}_R(a)=\{x\in \mathbb{R}^n:\ \left\lVert x-a\right\rVert\leq R\}.\\$
+$$
+\mathbb{B}_R(a)=\{x\in \mathbb{R}^n:\ \left\lVert x-a\right\rVert\leq R\}.\\
+$$
+
+
+
 
 **Definition.** 令 $S$ 是 $\mathbb{R}^n$ 的一个子集。
 
 1.  $S$ 是有界的(bounded)，如果 $S$ 中的向量长度是有界的。即如果存在一个半径 $R$，使得 $S$ 被包含在球 $\mathbb{B}_R(0)$中，则称 $S$ 有界。
 2.  $S$​ 是对称的(symmetric)，如果对于 $S$​ 中的每个点 $a$​，则其逆 $-a$​ 也在 $S$​ 中。
-3.  $S$ 是[凸的(convex)](https://link.zhihu.com/?target=https%3A//zh.wikipedia.org/wiki/%25E5%2587%25B8%25E9%259B%2586)，如果 $S$ 中的任意两点 $a$ 和 $b$ 满足，连接 $a$ 和 $b$ 的整个线段点完全位于 $S$ 内。
-4.  $S$ 是[闭的(closed)](https://link.zhihu.com/?target=https%3A//zh.wikipedia.org/wiki/%25E9%2597%25AD%25E9%259B%2586)，如果对于点 $a\in \mathbb{R}^n$ 满足，每个以 $a$ 为中心、半径为 $R$ 的球 $\mathbb{B}_R(a)$ 都包含 $S$ 中的点，则 $a$ 属于 $S$​。
+3.  $S$ 是[凸的(convex)](https://zh.wikipedia.org/wiki/凸集)，如果 $S$ 中的任意两点 $a$ 和 $b$ 满足，连接 $a$ 和 $b$ 的整个线段点完全位于 $S$ 内。
+4.  $S$ 是[闭的(closed)](https://zh.wikipedia.org/wiki/%E9%97%AD%E9%9B%86)，如果对于点 $a\in \mathbb{R}^n$ 满足，每个以 $a$ 为中心、半径为 $R$ 的球 $\mathbb{B}_R(a)$ 都包含 $S$ 中的点，则 $a$ 属于 $S$。
 
 > 闭集合另一个比较好理解的等价定义是：**一个集合为闭集当且仅当它包含其自身所有的极限点**。极限点是指：对于任意小的正半径 $R$ ，以 $a$ 为中心的球 $\mathbb{B}_R(a)$ 内总是存在 $S$ 中的点。  
 > 上面的定义可以在2维或3维上举个例子帮助理解。超链接中给出了维基百科的定义，其中有一些例子也可以帮助理解。
 
-[Minkowski 定理](https://link.zhihu.com/?target=https%3A//en.wikipedia.org/wiki/Minkowski%2527s_theorem)告诉我们：如果 $\mathbb{R}^n$ 中的一个关于原点对称的凸几何体 $S$ 的体积大于 $2^n$，那么 $S$ 必包含一个非原点的整数点。这个定理可以从整数格扩展到任意的格中。
+[Minkowski 定理](https://en.wikipedia.org/wiki/Minkowski's_theorem)告诉我们：如果 $\mathbb{R}^n$ 中的一个关于原点对称的凸几何体 $S$ 的体积大于 $2^n$，那么 $S$ 必包含一个非原点的整数点。这个定理可以从整数格扩展到任意的格中。
 
-**Theorem (Minkowski's Theorem).** 设 $L \subset \mathbb{R}^n$ 是一个 $n$ 维的 lattice，令 $S \subset \mathbb{R}^n$ 是一个对称凸集合(symmetric convex set)，其体积(volume)满足：
 
-$\text{Vol}(S) > 2^n\det(L).\\$
 
+**Theorem 7.28 (Minkowski's Theorem).** 设 $L \subset \mathbb{R}^n$ 是一个 $n$ 维的格，令 $S \subset \mathbb{R}^n$ 是一个对称凸集合(symmetric convex set)，其体积(volume)满足：
+$$
+\text{Vol}(S) > 2^n\det(L).\\
+$$
 则 $S$ 包含一个非零的格向量。如果 $S$ 同时也是闭的，则条件可以放宽到 $\text{Vol}(S) \geq 2^n\det(L).$​
 
 > 定理也被称为 Minkowski 凸体定理(Minkowski convex body theorem)。
 
-_Proof._ 令 $\mathcal{F}$ 表示 $L$ 的基本域。我们在基本域一节已经讨论过，对于任意 $a\in S$，都能被唯一的表示为：
+_Proof._ 令 $\mathcal{F}$ 表示 $L$ 的基本域。我们在基本域一节（定义7.18）已经讨论过，对于任意 $a\in S$，都能被唯一的表示为：
 
-$a=v_a+w_a\quad \text{with}\ v_a\in L\ \text{and}\ w_a \in \mathcal{F}.\\$
-
+$$
+a=v_a+w_a\quad \text{with}\ v_a\in L\ \text{and}\ w_a \in \mathcal{F}.\\
+$$
 我们令 $S^{'} = \frac{1}{2}S$，即将 $S$ 缩小两倍：
 
-$S^{'}=\frac{1}{2}S=\left\{\frac{1}{2}a:\ a\in S\right\}\\$
-
+$$
+S^{'}=\frac{1}{2}S=\left\{\frac{1}{2}a:\ a\in S\right\}\\
+$$
 考虑映射：
 
-$\begin{align}f:\ &S^{'} \rightarrow \mathcal{F},\\&\frac{1}{2}a \mapsto w_{\frac{1}{2}a}.\end{align}\\$
-
+$$
+\begin{align}f:\ & \frac{1}{2}S \rightarrow \mathcal{F},\\&\frac{1}{2}a \mapsto w_{\frac{1}{2}a}.\end{align}\\
+$$
 将 $S$ 缩小 2 倍会使其体积变为原来的 $1/2^n$，于是：
 
-$\text{Vol}(\frac{1}{2}S)=\frac{1}{2^n}\text{Vol}(S) > \det(L) = \text{Vol}(\mathcal{F}).\\$
-
+$$
+\text{Vol}(\frac{1}{2}S)=\frac{1}{2^n}\text{Vol}(S) > \det(L) = \text{Vol}(\mathcal{F}).\\
+$$
 这里我们利用了假设 $\text{Vol}(S)>2^n \det(L)$。
 
 > 对于一个 $n$ 维空间中的集合 $S$ ，如果我们对每一个点进行缩放，即将每一个点 $x\in S$ 缩放到 $cx$，其中 $c$ 是一个标量，那么新的集合 $cS$ 的体积 $V(cS)$ 与原集合 $S$ 的体积 $V(S)$ 之间的关系是： $$$V(cS)=|c|^nV(S)$$$
 
-映射 $f$ 由有限个平移映射([translation map](https://link.zhihu.com/?target=https%3A//proofwiki.org/wiki/Definition%3ATranslation_Mapping))组成(这里使用了 $S$ 有界的假设)，因此该映射是保持体积的。定义域 $S^{'}$ 的体积严格大于值域 $\mathcal{F}$ 的体积，意味着存在不同的点 $\frac{1}{2}a_1$ 和 $\frac{1}{2}a_2$，映射到了 $\mathcal{F}$​ 中相同的像：
+映射 $f$ 由有限个平移映射([translation map](https://proofwiki.org/wiki/Definition:Translation_Mapping))组成(这里使用了 $S$ 有界的假设)，因此该映射是保持体积的。定义域 $S^{'}$ 的体积严格大于值域 $\mathcal{F}$ 的体积，意味着存在不同的点 $\frac{1}{2}a_1$ 和 $\frac{1}{2}a_2$，映射到了 $\mathcal{F}$ 中相同的像：
 
 $\frac{1}{2}a_1=v_1+w\quad \text{and} \quad \frac{1}{2}a_2=v_2 + w \quad\text{with}\ v_1,v_2\in L\ \text{and}\ w \in \mathcal{F}.\\$
 
@@ -961,7 +976,7 @@ $\left\lVert a \right\rVert = \sqrt{a_1^2+\dots+a_n^2} \leq \sqrt{n}B = \sqrt{n}
 > $1. \ \lambda_1(L) < \sqrt{n}\det(L)^{\frac{1}{n}}$；  
 > $2.\ \prod_{i=1}^n\lambda_i(L)^{\frac{1}{n}}<\sqrt{n}\det(L)^{\frac{1}{n}}$.
 
-### The Gaussian heuristic
+### 7.5.3 Gaussian 启发式
 
 通过将 Minkowski 定理应用于超球面([hypersphere](https://link.zhihu.com/?target=https%3A//zh.wikipedia.org/wiki/N%25E7%25BB%25B4%25E7%2590%2583%25E9%259D%25A2))，而不是超立方体(hypercube),可以改进出现在 Hermite 定理中的常数。为了实现这一点，我们需要知道在 $\mathbb{R}^n$ 中球体的体积。
 
