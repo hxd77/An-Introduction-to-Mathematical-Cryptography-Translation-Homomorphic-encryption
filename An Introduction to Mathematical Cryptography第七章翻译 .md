@@ -927,7 +927,9 @@ $$
 
 映射 $f$ 由有限个平移映射([translation map](https://proofwiki.org/wiki/Definition:Translation_Mapping))组成(这里使用了 $S$ 有界的假设)，因此该映射是保持体积的。定义域 $S^{'}$ 的体积严格大于值域 $\mathcal{F}$ 的体积，意味着存在不同的点 $\frac{1}{2}a_1$ 和 $\frac{1}{2}a_2$，映射到了 $\mathcal{F}$ 中相同的像：
 
-$\frac{1}{2}a_1=v_1+w\quad \text{and} \quad \frac{1}{2}a_2=v_2 + w \quad\text{with}\ v_1,v_2\in L\ \text{and}\ w \in \mathcal{F}.\\$
+$$
+\frac{1}{2}a_1=v_1+w\quad \text{and} \quad \frac{1}{2}a_2=v_2 + w \quad\text{with}\ v_1,v_2\in L\ \text{and}\ w \in \mathcal{F}.\\
+$$
 
 > $S, S^{'}, \mathcal{F}$ 都是 $\mathbb{R}^n$ 的子集合，那么映射 $f$ 相当于是将在 $S^{'}$ 中的那些点/向量给_平移_ 到了 $\mathcal{F}$ 中，本质其实都是在 $\mathbb{R}^n$ 中移动点。因此经过有限次的平移后，这些点所构成的体积应该是不变的，即保持体积。  
 > 但现在经过映射后，反而体积变小了，这说明 $f$ 不是一个单射，否则应该有  
@@ -941,16 +943,19 @@ $\frac{1}{2}a_1=v_1+w\quad \text{and} \quad \frac{1}{2}a_2=v_2 + w \quad\text{wi
 
 两式相减得到非零向量：
 
-$\frac{1}{2}a_1-\frac{1}{2}a_2=v_1-v_2 \in L.\\$
-
+$$
+\frac{1}{2}a_1-\frac{1}{2}a_2=v_1-v_2 \in L.\\
+$$
 同时：
 
-$\underbrace{\frac{1}{2}a_1+\overbrace{(-\frac{1}{2}a_2)}}^{S\text{ is sysmetric, }\text{so } -a_2 \text{ is in } S}_{\begin{align}\text{this is the midpoint of the line}\\\text{ segment from }a_1\ \text{to}\ -a_2,\ \ \ \\ \text{so it is in}\ S\ \text{by convexity}\ \ \ \end{align}}\in S\\$
-
+$$
+\underbrace{\frac{1}{2}a_1+\overbrace{(-\frac{1}{2}a_2)}}^{S\text{ is sysmetric, }\text{so } -a_2 \text{ is in } S}_{\begin{align}\text{this is the midpoint of the line}\\\text{ segment from }a_1\ \text{to}\ -a_2,\ \ \ \\ \text{so it is in}\ S\ \text{by convexity}\ \ \ \end{align}}\in S\\
+$$
 因此：
 
-$0 \neq v_1 -v_2 \in S\cap L,\\$
-
+$$
+0 \neq v_1 -v_2 \in S\cap L,\\
+$$
 于是我们在 $S$ 中构建了一个非零格点。
 
 _Proof of Hermite's theorem._ 设 $L \subset \mathbb{R}^n$ 是一个 lattice，令 $S$ 表示 $\mathbb{R}^n$ 上的以0为中心，边长长为 $2B$ 的一个超方形 ([hypercube](https://link.zhihu.com/?target=https%3A//zh.wikipedia.org/wiki/%25E8%25B6%2585%25E6%2596%25B9%25E5%25BD%25A2))，
