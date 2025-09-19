@@ -958,6 +958,10 @@ $$
 $$
 于是我们在 $S$ 中构建了一个非零格点。
 
+这就完成了在假定集合\( $S$ \)的体积严格大于\( $2^n\det(L).$ \)时Minkowski的证明。现在我们假设\( $S$ \)是闭集，并且允许 $\mathrm{Vol}(S)=2^{n}\operatorname*{det}(L)$。对于每个$k\geq1$，我们将$S$ 按$1+\frac{1}{k}$的比例进行扩张，然后应用前面的结论来找到一个非零向量。
+
+
+
 _Proof of Hermite's theorem._ 设 $L \subset \mathbb{R}^n$ 是一个 lattice，令 $S$ 表示 $\mathbb{R}^n$ 上的以0为中心，边长长为 $2B$ 的一个超方形 ([hypercube](https://link.zhihu.com/?target=https%3A//zh.wikipedia.org/wiki/%25E8%25B6%2585%25E6%2596%25B9%25E5%25BD%25A2))，
 
 $S=\{(x_1,\dots,x_n)\in \mathbb{R}^n:\ -B \leq x_i\leq B \quad \text{for all }1 \leq i \leq n\}.\\$
@@ -1095,30 +1099,35 @@ $\left\lVert v - w\right\rVert \approx\sigma(L).\\$
 
 与 SVP 类似，如果 $L$ 包含一个与 $w$ 之间的距离比 $\sigma(L)$​ 小得多的向量，则格约化算法在解决 CVP 时就会更容易。
 
-## Babai's algorithm and using a “good” basis to solve apprCVP
 
-> 这一节对应教材的6.6.
 
-如果格 $L \subset \mathbb{R}^n$ 有一组相互正交的基 $v_1,\dots,v_n$，即满足：
+## 7.6 Babai's 算法 和 使用一个好基去解决 apprCVP
 
-$v_i \cdot v_j = 0 \quad\text{for all }i\neq j,\\$
+如果格 $L \subset \mathbb{R}^n$ 有组相互正交的基 $v_1,\dots,v_n$，即满足：
 
-则我们可以轻松解决 SVP 和CVP。为解决 SVP，我们观察到 $L$ 中的任何向量的长度都由下面公式给出：
+$$
+v_i \cdot v_j = 0 \quad\text{for all }i\neq j,\\
+$$
+则我们可以轻松解决 SVP 和 CVP。为解决 SVP，我们观察到 $L$ 中的任何向量的长度都由下面公式给出：
 
-$\left\lVert a_1v_1+\dots+a_nv_n\right\rVert^2=a_1^2\left\lVert v_1 \right\rVert^2+\dots+a_n^2\left\lVert v_n \right\rVert^2.\\$
-
+$$
+\left\lVert a_1v_1+\dots+a_nv_n\right\rVert^2=a_1^2\left\lVert v_1 \right\rVert^2+\dots+a_n^2\left\lVert v_n \right\rVert^2.\\
+$$
 因为 $a_1,\dots,a_n\in \mathbb{Z}$，所以 $L$ 中的最短非零向量就是集合 $\{\pm v_1,\dots,\pm v_n\}$ 中的最短向量。即
 
-$v_{\text{shortest}}=\{v_i:\ \left\lVert v_i \right\rVert=\min\{\left\lVert v_1 \right\rVert, \dots, \left\lVert v_n \right\rVert\} \}\\$
-
+$$
+v_{\text{shortest}}=\{v_i:\ \left\lVert v_i \right\rVert=\min\{\left\lVert v_1 \right\rVert, \dots, \left\lVert v_n \right\rVert\} \}\\
+$$
 类似地可以解决 CVP。我们想要寻找 $L$ 中的一个最短向量，使其与给定向量 $w\in \mathbb{R}^n$ 的距离最近。我们首先将 $w$ 表示为：
 
-$w=t_1v_1+\dots+t_nv_n \quad \text{with }t_1,\dots,t_n\in \mathbb{R}.\\$
-
+$$
+w=t_1v_1+\dots+t_nv_n \quad \text{with }t_1,\dots,t_n\in \mathbb{R}.\\
+$$
 那么对于 $v=a_1v_1+\dots+a_nv_n \in L$，我们有：
 
-$\left\lVert v-w \right\rVert^2=(a_1-t_1)^2\left\lVert v_1 \right\rVert^2+\dots+(a_n-t_n)^2\left\lVert v_n \right\rVert^2.\\$
-
+$$
+\left\lVert v-w \right\rVert^2=(a_1-t_1)^2\left\lVert v_1 \right\rVert^2+\dots+(a_n-t_n)^2\left\lVert v_n \right\rVert^2.\\
+$$
 $a_i$ 是整数，因此上式要想取得最小值，我们只需将每个 $a_i$ 设置为与相应的 $t_i$ 最为接近的整数即可。
 
 如果基中的向量是相互正交的，那么我们很有可能能够成功解决 CVP；但是如果基向量高度不正交，那么该算法就不会运行得很好。我们简要讨论一下潜在的几何原理，然后描述一般的方法，最后以一个二维的例子作结。
@@ -1133,7 +1142,7 @@ $\epsilon_i = \left\{\begin{aligned}0,&\quad \text{if }\ \epsilon_i<\frac{1}{2}\
 
 下图展示了整个过程：
 
-![](https://pic4.zhimg.com/v2-8fefebe020c0e75599f816e4314c781b_1440w.jpg)
+
 
 图 2. 尝试用给定的基本域来求解 CVP，源自《An Introduction to Mathematical Cryptography》
 
@@ -1216,3 +1225,9 @@ $\left\lVert v^{'}-w \right\rVert \approx 3308.12.\\$
 基底 $\{v_1^{'},v_2^{'}\}$ 的非正交性也反映在 Hadamard 比率上：
 
 $\mathcal{H}(v_1^{'},v_2^{'})=\left(\frac{\det(L)}{\left\lVert v_1^{'}\right\rVert \left\lVert v_2^{'}\right\rVert} \right)^{1/2}\approx \left(\frac{92699}{2022.99 \times 7721.36}\right)^{1/2}\approx 0.077\\$
+
+
+
+
+
+## 7.6 
