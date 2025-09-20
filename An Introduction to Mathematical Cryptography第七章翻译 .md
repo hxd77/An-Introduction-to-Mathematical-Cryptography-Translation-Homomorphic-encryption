@@ -958,22 +958,33 @@ $$
 $$
 于是我们在 $S$ 中构建了一个非零格点。
 
-这就完成了在假定集合\( $S$ \)的体积严格大于\( $2^n\det(L).$ \)时Minkowski的证明。现在我们假设\( $S$ \)是闭集，并且允许 $\mathrm{Vol}(S)=2^{n}\operatorname*{det}(L)$。对于每个$k\geq1$，我们将$S$ 按$1+\frac{1}{k}$的比例进行扩张，然后应用前面的结论来找到一个非零向量。
+这就完成了在假定集合 $S$ 的体积严格大于 $2^n\det(L).$ 时Minkowski的证明。现在我们假设 $S$ 是闭集，并且允许 $\mathrm{Vol}(S)=2^{n}\operatorname*{det}(L)$。对于每个$k\geq1$，我们将$S$ 按$1+\frac{1}{k}$的比例进行扩张，然后应用前面的结论来找到一个非零向量。
+
+$$
+\mathbf{0}\neq\boldsymbol{v}_{k}\in\left(1+\frac{1}{k}\right)S\cap L.
+$$
+每个格向量$\boldsymbol{v}_1,\boldsymbol{v}_2,\ldots$都在有界集 $2S$ 中，因此格 $L$ 的离散性告诉我们，该序列只包含有限多个不同的向量。因此，我们可以选择某个在序列中出现无限多次的向量 $\boldsymbol{v}$ ，这样我们就找到了一个位于如下交集内的非零格向量 $\boldsymbol{v}\in L$。
+$$
+\bigcap_{k=1}^\infty\left(1+\frac{1}{k}\right)S.\quad(7.15)
+$$
+假设 $S$ 是闭集，这意味着交集（7.15）等于 $S$，因此 $0 \ne v ∈ S∩L。$
 
 
 
-_Proof of Hermite's theorem._ 设 $L \subset \mathbb{R}^n$ 是一个 lattice，令 $S$ 表示 $\mathbb{R}^n$ 上的以0为中心，边长长为 $2B$ 的一个超方形 ([hypercube](https://link.zhihu.com/?target=https%3A//zh.wikipedia.org/wiki/%25E8%25B6%2585%25E6%2596%25B9%25E5%25BD%25A2))，
+_Proof of Hermite's theorem (Theorem 7.25)._ 设 $L \subset \mathbb{R}^n$ 是一个 格，令 $S$ 表示 $\mathbb{R}^n$ 上的以0为中心，边长长为 $2B$ 的一个超方形 ([hypercube](https://zh.wikipedia.org/wiki/超方形))，
 
 $S=\{(x_1,\dots,x_n)\in \mathbb{R}^n:\ -B \leq x_i\leq B \quad \text{for all }1 \leq i \leq n\}.\\$
 
 集合 $S$ 满足对称性、封闭性且有界，其体积为：
 
-$\text{Vol}(S) = (2B)^n\\$
-
+$$
+\text{Vol}(S) = (2B)^n\\
+$$
 因此，如果我们令 $B=\det(L)^{1/n}$，则 $\text{Vol}(S)=2^n\det(L)$，此时应用 Minkowski 定理便能推导出存在一个非零向量 $0\neq a \in S \cap L$。用坐标表示 $a=(a_1,\dots,a_n),\ -B \leq a_i\leq B$，根据 $S$ 的定义我们有：
 
-$\left\lVert a \right\rVert = \sqrt{a_1^2+\dots+a_n^2} \leq \sqrt{n}B = \sqrt{n} \det(L)^{1/n}.\\$
-
+$$
+\left\lVert a \right\rVert = \sqrt{a_1^2+\dots+a_n^2} \leq \sqrt{n}B = \sqrt{n} \det(L)^{1/n}.\\
+$$
 这就完成了 Hermite 定理的证明。
 
 > 这里补充一下格的逐次最小长度(successive minima) 与 Minkowski 第一第二定理。  
@@ -990,48 +1001,65 @@ $\left\lVert a \right\rVert = \sqrt{a_1^2+\dots+a_n^2} \leq \sqrt{n}B = \sqrt{n}
 通过将 Minkowski 定理应用于超球面([hypersphere](https://link.zhihu.com/?target=https%3A//zh.wikipedia.org/wiki/N%25E7%25BB%25B4%25E7%2590%2583%25E9%259D%25A2))，而不是超立方体(hypercube),可以改进出现在 Hermite 定理中的常数。为了实现这一点，我们需要知道在 $\mathbb{R}^n$ 中球体的体积。
 
 **Definition.** 对于 $s>0$，伽马函数(gamma function) $\Gamma(s)$ 用积分定义为：
-
-$\Gamma(s)=\int_0^{\infty} t^s e^{-t}\frac{dt}{t}.\\$
-
+$$
+\Gamma(s)=\int_0^{\infty} t^s e^{-t}\frac{dt}{t}.\quad{(7.16)}
+$$
 我们列出一些基本性质。
 
-**Proposition.**
+**Proposition 7.29**
 
 1.  对于所有的 $s>0$，定义 gamma 函数 $\Gamma(s)$ 的积分是收敛的。
 2.  $\Gamma(1)=1$ 且 $\Gamma(s+1)=s \Gamma(s)$。这使得我们能够将 $\Gamma(s)$ 扩展到所有 $s \in \mathbb{R}$ 上，对于 $s\neq 0,-1,-2,\dots$.
-3.  对于所有的整数 $n\geq 1$，我们有 $\Gamma(n+1)=n!$。因此 gamma 函数即为阶乘函数在实数与复数域上的推广。
+3.  对于所有的整数 $n\geq 1$，我们有 $\Gamma(n+1)=n!$。因此 $\Gamma({s})$ 函数即为阶乘函数在实数与复数域上的推广。
 4.  $\Gamma(\frac{1}{2})=\sqrt{\pi}$​.
 5.  (Stirling's 公式) 当 $s$ 很大时我们有：  
-    $\Gamma(1+s)^{1/s}\approx\frac{s}{e}.\\$  
+    $$
+    \Gamma(1+s)^{1/s}\approx\frac{s}{e}.\\
+    $$
+    
     更精确来说，  
-    $\ln\Gamma(1+s)=\ln(\frac{s}{e})^s+\frac{1}{2}\ln(2\pi s) +O(1)\ \text{as } s \rightarrow \infty.\\$
+    $$
+    \ln\Gamma(1+s)=\ln(\frac{s}{e})^s+\frac{1}{2}\ln(2\pi s) +O(1)\ \text{as } s \rightarrow \infty.\\
+    $$
+    
+6.  
 
 $n$ 维空间中的球体体积公式包含了 gamma 函数。
 
-**Theorem.** 令 $\mathbb{B}_R(a)$ 表示 $\mathbb{R}^n$ 中半径为 $R$ 的球体。则其体积为：
 
-$\text{Vol}(\mathbb{B}_R(a))=\frac{\pi^{n/2}R^n}{\Gamma(1+\frac{n}{2})}.\\$
 
+**Theorem 7.30** 令 $\mathbb{B}_R(a)$ 表示 $\mathbb{R}^n$ 中半径为 $R$ 的球体。则其体积为：
+$$
+\text{Vol}(\mathbb{B}_R(a))=\frac{\pi^{n/2}R^n}{\Gamma(1+\frac{n}{2})}.\quad{(7.18)}
+$$
 当 $n$ 很大时，利用Stirling公式和上式可以得到，$\mathbb{B}_R(a)$ 的体积可以近似表示为：
 
-$\text{Vol}(\mathbb{B}_R(a))^{1/n}\approx\sqrt{\frac{2\pi e}{n}}R.\\$
+$$
+\text{Vol}(\mathbb{B}_R(a))^{1/n}\approx\sqrt{\frac{2\pi e}{n}}R. \quad{(7.19)}
+$$
+我们可以用(7.18)和Stirling公式改进(7.19)，因此
+$$
+\mathrm{Vol}\left(\mathbb{B}_R(\boldsymbol{a})\right)^{1/n}=\frac{\pi^{1/2}R}{\Gamma(1+n/2)^{1/n}}\approx\frac{\pi^{1/2}R}{(n/2e)^{1/2}}=\sqrt{\frac{2\pi e}{n}}R.
+$$
+_Remark 7.31_ 利用上面的定理我们可以改进 Hermite 定理当 $n$ 很大时的情况。球体 $\mathbb{B}_R(0)$ 是有界的、封闭的、凸的且对称的，于是根据 Minkowski 定理，如果我们选择 $R$ 满足：
+$$
+\text{Vol}(\mathbb{B}_R(0)) \geq 2^n \det(L),\\
+$$
+则球体 $\mathbb{B}_R(0)$ 包含了一个非零格点。当 $n$ 很大时，利用球体体积的近似公式(7.19)，我们需要选择 $R$ 满足：
 
-_Remark._ 利用上面的定理我们可以改进 Hermite 定理当 $n$ 很大时的情况。球体 $\mathbb{B}_R(0)$ 是有界的、封闭的、凸的且对称的，于是根据 Minkowski 定理，如果我们选择 $R$ 满足：
-
-$\text{Vol}(\mathbb{B}_R(0)) \geq 2^n \det(L),\\$
-
-则球体 $\mathbb{B}_R(0)$ 包含了一个非零格点。当 $n$ 很大时，利用球体体积的近似公式，我们需要选择 $R$ 满足：
-
-$\sqrt{\frac{2\pi e}{n}}R \gtrapprox 2\det(L)^{1/n}\\$
-
+$$
+\sqrt{\frac{2\pi e}{n}}R \gtrapprox 2\det(L)^{1/n}\\
+$$
 根据 $\mathbb{B}_R(0)$ 的定义，有：
 
-$\mathbb{B}_R(0)=\{x \in \mathbb{R}^n:\ \left\lVert x \right\rVert \leq R\}\\$
-
+$$
+\mathbb{B}_R(0)=\{x \in \mathbb{R}^n:\ \left\lVert x \right\rVert \leq R\}\\
+$$
 因此，存在一个非零向量 $v \in L$​ 满足：
 
-$\left\lVert v \right\rVert\lessapprox\sqrt{\frac{2n}{\pi e}} \cdot (\det(L))^{1/n}\\$
-
+$$
+\left\lVert v \right\rVert\lessapprox\sqrt{\frac{2n}{\pi e}} \cdot (\det(L))^{1/n}\\
+$$
 这便通过一个因子 $\sqrt{2/\pi e} \approx 0.484$ 改进了 Hermite 定理。
 
 尽管最短向量的准确界在 $n$ 很大时是未知的，但我们可以基于以下原理的概率论证来估计其范围：
@@ -1049,40 +1077,50 @@ $\left\lVert v \right\rVert\lessapprox\sqrt{\frac{2n}{\pi e}} \cdot (\det(L))^{1
 
 而关于误差项的估计：
 
-$\#\{(x,y) \in \mathbb{Z}^2:\ x^2+y^2 \leq R^2\} = \pi R^2 +\text{(error term)}\\$
-
+$$
+\#\{(x,y) \in \mathbb{Z}^2:\ x^2+y^2 \leq R^2\} = \pi R^2 +\text{(error term)}\\
+$$
 是一个著名的经典问题。随着维数的增大，问题会更加困难，因为当半径不够大时，由靠近球边界的格点所造成的误差会相当大。因此下面的估计：
 
-$\#\{v \in L:\ \left\lVert v \right\rVert \leq R\}\approx \frac{\text{Vol}(\mathbb{B}_R(0))}{\text{Vol}(\mathcal{F})}\\$
-
+$$
+\#\{v \in L:\ \left\lVert v \right\rVert \leq R\}\approx \frac{\text{Vol}(\mathbb{B}_R(0))}{\text{Vol}(\mathcal{F})}\\
+$$
 在 $n$ 很大且 $R$ 不够大的情况下是有问题的。尽管如此，我们仍然可以寻找使右边等于1的 $R$ 的值，因为从某种意义上说，这个 $R$ 值是我们可能首次在球内发现非零格点的那个半径值。
 
-考虑 $n$ 很大的情形，我们用球体体积的估计值公式计算。令：
+考虑 $n$ 很大的情形，我们用球体体积的估计值公式(7.19)计算。令：
 
-$\sqrt{\frac{2\pi e}{n}}R \approx\text{Vol}(\mathbb{B}_R(0))^{1/n}\quad \text{equal to}\quad \text{Vol}(\mathcal{F})=\det(L),\\$
-
+$$
+\sqrt{\frac{2\pi e}{n}}R \approx\text{Vol}(\mathbb{B}_R(0))^{1/n}\quad \text{equal to}\quad \text{Vol}(\mathcal{F})=\det(L),\\
+$$
 解得：
 
-$R\approx \sqrt{\frac{n}{2\pi e}}(\det(L))^{1/n}.\\$
-
+$$
+R\approx \sqrt{\frac{n}{2\pi e}}(\det(L))^{1/n}.\\
+$$
 我们便推出了下面的启发式算法。
 
-**Definition.** 设 $L$ 是 $n$ 维的 lattice。高斯的期望最短长度(Gaussian expected shortest length)是：
 
-$\sigma(L) = \sqrt{\frac{n}{2\pi e}}(\det(L))^{1/n}.\\$
 
+**Definition.** 设 $L$ 是 $n$ 维的格。高斯的期望最短长度(Gaussian expected shortest length)是：
+$$
+\sigma(L) = \sqrt{\frac{n}{2\pi e}}(\det(L))^{1/n}.\\
+$$
 高斯的启发式(Gaussian heuristic)方法指的是：一个随机选择的格中，最短非零向量将满足：
 
-$\left\lVert v_{\text{shortest}}\right\rVert \approx \sigma(L).\\$
-
+$$
+\left\lVert v_{\text{shortest}}\right\rVert \approx \sigma(L).\\
+$$
 更精确来说，若 $\epsilon > 0$ 固定，那么对于所有足够大的 $n$，一个随机选择的 $n$ 维格满足：
 
-$(1-\epsilon) \sigma(L) \leq\left\lVert v_{\text{shortest}}\right\rVert\leq(1+\epsilon)\sigma(L).\\$
+$$
+(1-\epsilon) \sigma(L) \leq\left\lVert v_{\text{shortest}}\right\rVert\leq(1+\epsilon)\sigma(L).\\
+$$
 
-_Remark._ 对于较小的 $n$ 值，使用体积的精确公式更好，此时高斯的期望最短长度为：
 
-$\sigma(L)=\frac{\Gamma(1+n/2)}{\sqrt{\pi}}(\det(L))^{1/n}\\$
-
+_Remark 7.32_ 对于较小的 $n$ 值，使用体积的精确公式(7.18)更好，此时高斯的期望最短长度为：
+$$
+\sigma(L)=\frac{\Gamma(1+n/2)}{\sqrt{\pi}}(\det(L))^{1/n}\\
+$$
 我们会发现高斯启发式方法在量化格中 SVP 的困难程度时很有用。特别是，如果一个特定格 $L$ 的实际最短向量明显比 $\sigma(L)$​ 短，那么诸如 LLL 等格约化算法在定位最短向量时似乎就会容易得多。
 
 _Example._ 设 $(m_1,\dots,m_n,S)$ 是一个背包问题。相关联的格 $L_{M,S}$ 是由 $(*)$ 矩阵的行生成的。矩阵 $L_{M,S}$ 的维度为 $n+1$，行列式为 $\det(L_{M,S})=2^nS$。在子集和问题一节中说过，$S$ 的大小满足 $S=O(2^{2n})$，所以 $S^{1/n}\approx 4$。所以我们可以估计高斯的最短长度为：
