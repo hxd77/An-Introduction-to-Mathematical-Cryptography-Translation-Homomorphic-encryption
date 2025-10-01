@@ -416,7 +416,7 @@ echo decode("=pJovuTsWOUrtIJZtcKZ2OJMzEJZyMTLdIas");
 
 
 
-### 2-15：你不知道的事
+### 题目：2-15：你不知道的事
 
 考查点：sha1函数的特性
 
@@ -432,9 +432,98 @@ echo decode("=pJovuTsWOUrtIJZtcKZ2OJMzEJZyMTLdIas");
 
 ![image-20250927161759063](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20250927161759063.png)
 
-通过分析代码，可以看出程序通过GET方法传入两个参数name和passwd。其第一个条件是name和passwd不能相等。第二个条件是name和passwd的值在经过sha1函数处理后得到的散列值在PHP模式下进行比较要想等。在这里，我们需要了解的是sha1函数对处理对象的选择和对返回类型的处理。如下图所示，通过PHP手册查看sha1函数的使用方法和特性，如下图：
+通过分析代码，可以看出程序通过GET方法传入两个参数`name`和`passwd`。其第一个条件是`name`和`passwd`不能相等。第二个条件是`name`和`passwd`的值在经过sha1函数处理后得到的散列值在PHP模式下进行比较要想等。在这里，我们需要了解的是sha1函数对处理对象的选择和对返回类型的处理。如下图所示，通过PHP手册查看sha1函数的使用方法和特性，如下图：
 
 ![image-20250927221523796](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20250927221523796.png)
 
 可以看到sha1()函数在此处理的字符串值。我们通过脚本测试sha1()函数对于其他值的处理，如下图：
 
+```php
+<?php
+$str='123456';              // 定义一个字符串变量 $str
+$inter=1234;                // 定义一个整型变量 $inter
+$arr=array('xw');           // 定义一个数组 $arr，里面只有一个元素 "xw"
+
+print sha1($str);           // 对字符串 "123456" 计算 sha1 值
+print sha1($inter);         // 对整数 1234 计算 sha1 值（会被转成字符串 "1234"）
+print sha1($arr);           // 对数组调用 sha1()，这是不允许的，会报错
+?>
+```
+
+可以看到sha1()函数在处理数组时报错，提示因sha1()函数只接受字符串参数。在此题中，要求name和password两个参数值本身不相等却要求sha1()函数处理后的值相等，这在密码学上不符合哈希函数的强抗碰撞性，即要找到散列值相同的两条不同消息是非常困难的。我们可以构造两个两个参数都是数组类型的变量值代入，以改变参数类型，使得sha1()函数在处理数组对象时报错。由于对于两个不同的数组处理后的结果肯定是一样的，因而可以达到绕过的目的。完整的绕过参数如下：
+
+```php
+name[]=1&password[]=2
+```
+
+如下图所示：
+
+![image-20251001001102655](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20251001001102655.png)
+
+
+
+### 题目2-16：科学计数法
+
+考查点：PHP中科学记数法的表示
+
+打开题目如下：
+
+![image-20251001001310363](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20251001001310363.png)
+
+题目给的代码信息如下：
+
+```php
+<?php
+
+$flag = '*********';
+
+if (isset($_GET['password'])) {
+
+	if (is_numeric($_GET['password'])){
+
+		if (strlen($_GET['password']) < 4){
+
+			if ($_GET['password'] > 999)
+
+				die($flag);
+
+			else
+
+				print '<p class="alert">Too little</p>';
+
+		} else
+
+				print '<p class="alert">Too long</p>';
+
+	} else
+
+		print '<p class="alert">Password is not numeric</p>';
+
+}
+
+?>
+```
+
+它通过三个条件判断让我们对参数password进行赋值，要求password是整数，其长度小于4且值大于999。当这三个条件同时满足时，才会将flag值显示出来。显然要用科学计数法。如果我们在PHP代码中定义的一个数字很长（这在有些语义环境中可能并不合适），那么可以通过科学记数法将其打印出来，如下图所示：
+
+```php
+<?php
+$number=120000000000000000000;
+$result=sprintf("%e", $number);//// 用科学计数法格式化，比如 "1.200000e+20"
+$afterformat=str_replace("e+","* 10^",$result);
+//在字符串 $result 里，把所有的 "e+" 替换成 "* 10^"，并把结果赋值给 $afterformat。
+echo $afterformat;
+?>
+```
+
+输出结果为`1.200000* 10^20`。这里我们将一个22位的数字通过指数幂表示出来，而`1.200000* 10^20`也可以表示为`1.2e20（不能写为1.2e+20）`，因此在此题中，我们通过对1eN进行flag值的获取。再次查看之前的条件，大于999的最小整数是1000，如下图表示为1e3带入：
+
+![image-20251001003404727](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20251001003404727.png)
+
+
+
+### 题目2-17：反序列化与文件包含
+
+考查点：有关PHP序列化和反序列化的基本知识
+
+反序列化是近几年频繁出现的漏洞之一，下面我们介绍序列化和反序列化的概念。
