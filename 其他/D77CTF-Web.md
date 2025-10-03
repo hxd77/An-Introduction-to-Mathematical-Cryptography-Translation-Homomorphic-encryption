@@ -526,4 +526,98 @@ echo $afterformat;
 
 考查点：有关PHP序列化和反序列化的基本知识
 
-反序列化是近几年频繁出现的漏洞之一，下面我们介绍序列化和反序列化的概念。
+反序列化是近几年频繁出现的漏洞之一，下面我们介绍序列化和反序列化的概念。举个简单例子，我们在电商网站上买桌柜，桌柜属于很多不规则的东西，该如何从一个城市运输到另一个城市呢？这是一般会把它拆成板子，装到箱子里，通过快递寄出来。这类似于我们的序列化过程（把数据转换成可存储或传输的形式）。当买家收到货时，需要自己把这些板子组装成桌柜的样子，这就像反序列化过程（转换成当初的数据对象）。
+
+下面是一道2016年的XCTF题目，打开链接，如下图：
+
+![image-20251001190510684](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20251001190510684.png)
+
+如下图所示，查看源代码：
+
+```php
+
+<?php
+$user = $_GET["user"];
+$file = $_GET["file"];
+$pass = $_GET["pass"];
+if(isset($user)&&(file_get_contents($user,'r')==="the user is admin")){
+    echo "hello admin!<br>";
+    if(preg_match("/f1a9/",$file)){
+        exit();
+    }else{
+        include($file); //class.php
+        $pass = unserialize($pass);
+        echo $pass;
+    }
+}else{
+    echo "you are not admin ! ";
+}
+?>
+<!DOCTYPE>
+<html>
+<meta name="name" content="content" charset="utf-8">
+<head>
+	<title>
+		PHP反序列化
+	</title>
+</head>
+<body>
+</body>
+</html>
+```
+
+要获取flag值，我们必须突破题目所设置的障碍。首先要考虑的是``if`判断，如下所示：
+
+```php
+if(isset($user)&&(file_get_contents($user,'r')==="the user is admin"))
+```
+
+要求传一个文件读取包含`file_get_contents($user,'r')='the user is admin'`。我们考虑用法PHP的封装协议`php://input`。因为该协议可以得到原始的POST数据，所以在题目链接后面加上如下所示的参数。
+
+`user=php://input`
+
+>**php://input**可以访问请求的原始数据的只读流，将**post**请求的数据当作php代码执行。当传入的参数作为文件名打开时，可以将参数设为php://input,同时post想设置的文件内容，php执行时会将post内容当作文件内容。从而导致任意代码执行。
+
+
+
+### 题目2-18：二进制比较
+
+考查点：strcmp()函数的语法缺陷
+
+
+
+### 题目2-19：变量覆盖
+
+考查点：变量覆盖的基本原理
+
+打开
+
+![](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20251001200808470.png)
+
+访问题目链接，以管理员身份登录，密码随机填写。完成后单击“提交”按钮，用Burp Suite抓包，如下图所示：
+
+
+
+### 题目2-20：什么都没有
+
+考查点：有关文件包含的知识
+
+打开题目如下：
+
+![image-20251001223017947](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20251001223017947.png)
+
+在输入框中输入字符看是否有效果。左边有报错信息提示`error file or error method`，这说明我们在输入框中提交的数据方法和参数都不对。我们利用Hackbar插件提交POST数据，如下图：
+
+![image-20251001223654156](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20251001223654156.png)
+
+系统还是报错，说明POST方法并不正确，而应该是`php://filter`或`php://input`等几种方式。构造绕过方法，如下所示：
+
+```php
+php://filter/read=convert.base64-encode/resource=index.php
+```
+
+![image-20251002003530729](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20251002003530729.png)
+
+通过访问得到index.php进行Base64编码后的结果，如上图，解码得到flag：
+
+![image-20251002003951051](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/image-20251002003951051.png)
