@@ -10,89 +10,103 @@ Part 1, Vanilla Encoding and Decoding
 
 ## Introduction
 
-Homomorphic encryption is a promising field which allows computation on encrypted data. This excellent post, [What Is homomorphic Encryption](https://blog.openmined.org/what-is-homomorphic-encryption/), provides a broad explanation of what homomorphic encryption is and what the stakes are for this field of research.
+同态加密是一个很有前途的领域，它允许对加密数据进行计算。这篇优秀的文章，什么是同态加密，广泛解释了什么是同态加密以及该研究领域的利害关系。
 
-In this series of articles, we will study in depth the Cheon-Kim-Kim-Song (CKKS) scheme, which is first discussed in the paper [Homomorphic Encryption for Arithmetic of Approximate Numbers](https://eprint.iacr.org/2016/421.pdf). CKKS allows us to perform computations on vectors of complex values (thus real values as well). The idea is that we will implement CKKS from scratch in Python and then, by using these crypto primitives, we can explore how to perform complex operations such as linear regression, neural networks, and so on.
+在本系列文章中，我们将深入研究 Cheon-Kim-Kim-Song （CKKS） 方案，该方案在论文 Homomorphic Encryption for Arithmetic of Approximate Numbers 中首次讨论。CKKS 允许我们对复值的向量（因此也是实值）执行计算。这个想法是，我们将在 Python 中从头开始实现 CKKS，然后，通过使用这些加密原语，我们可以探索如何执行复杂的作，例如线性回归、神经网络等。
 
-![](https://raw.githubusercontent.com/hxd77/BlogImage/master/TyporaImage/20251004224359731.svg+xml)
+关于CKKS的[视频资源](https://www.youtube.com/watch?v=iQlgeL64vfo)
 
-High level view of CKKS
+![image-20251006213852098](https://raw.githubusercontent.com/hxd77/BlogImage/master/TyporaImage/20251006213852145.png)
 
-The figure above provides a high-level view of CKKS. We can see that a message **m**, a vector of values on which we want to perform certain computation, is first encoded into a _plaintext_ polynomial **p(X)** and then encrypted using a public key.
+图一、CKKS的高级视图
 
-CKKS works with polynomials because they provide a good trade-off between security and efficiency as compared to standard computations on vectors.
+上图提供了 CKKS 的高级视图。我们可以看到，消息 $m$（我们要对其执行某些计算的值向量）首先被编码为明文多项式 $p（X）$，然后使用公钥进行加密。
 
-Once the message **m** is encrypted into **c**,  a couple of polynomials, CKKS provides several operations that can be performed on it, such as addition, multiplication and rotation.
+CKKS 使用多项式，因为与向量上的标准计算相比，它们在安全性和效率之间提供了良好的权衡。
 
-If we denote a function by **f**, which is a composition of homomorphic operations, then decrypting **c’ = f(c)** with the secret key will yield **p’ = f(p)**. Therefore once we decode it, we will get **m = f(m).**
+一旦消息 $m$ 被加密为 $c$（几个多项式），CKKS 就会提供可以对其执行的多种运算，例如加法、乘法和旋转
 
-The central idea to implement a homomorphic encryption scheme is to have homomorphic properties on the _encoder_, _decoder_, _encryptor_ and _decryptor_. This way, operations on _ciphertext_ will be decrypted and decoded correctly and provide outputs as if operations were done directly on _plaintext_.
+如果我们用 $f$ 表示一个函数，它是同态运算的组成，那么使用密钥解密 $c^{\prime} = f（c）$ 将产生 $p' = f（p）$。因此，一旦我们解码它，我们将得到 $m = f（m）$。
 
-So in this article we will see how to implement the encoder and the decoder, and in later articles we will continue to implement the encryptor and decryptor to have a homomorphic encryption scheme.
+实现同态加密方案的中心思想是在编码器、解码器、加密器和解密器上具有同态属性。这样，密文作将被正确解密和解码，并提供输出，就像直接对明文进行作一样。
+
+所以在本文中我们将了解如何实现编码器和解码器，在后面的文章中我们将继续实现加密器和解密器以具有同态加密方案。
+
+
 
 **Preliminaries**
 
-Basic knowledge in linear algebra and ring theory is recommended to have a good understanding of how CKKS is implemented. You can acquaint yourself with these topics using the following links:
+建议具备线性代数和环理论的基础知识，以便对 CKKS 的实施方式有很好的理解。您可以使用以下链接熟悉这些主题：
 
 - [Introduction to linear algebra](https://math.mit.edu/~gs/linearalgebra/) provides a good basis in linear algebra.
 - [Ring theory (Math 113)](https://math.berkeley.edu/~mcivor/math113su16/113ringnotes2016.pdf) is a good resource to learn ring theory.
 
-Specifically for this article, we will rely on the following concepts:
+具体到本文，我们将依赖以下概念：
 
-- [Cyclotomic polynomials](https://en.wikipedia.org/wiki/Cyclotomic_polynomial) which are polynomials with nice properties, as they allow efficient computations when used as polynomial modulo.
-- [Canonical embedding](https://en.wikipedia.org/wiki/Embedding) which is used for encoding and decoding. They have the nice properties of being isomorphism, i.e. one-to-one homomorphisms between vectors and polynomials.
-- [Vandermonde matrices](https://en.wikipedia.org/wiki/Vandermonde_matrix) which are a special class of matrices, which we will use to have the inverse of the canonical embedding.
+- [圆体多项式](https://en.wikipedia.org/wiki/Cyclotomic_polynomial)是具有良好属性的多项式，因为它们在用作多项式模时允许高效计算。
+- [规范嵌入](https://en.wikipedia.org/wiki/Embedding)，用于编码和解码。它们具有同构的良好特性，即向量和多项式之间的一对一同态。
+- [范德蒙德矩阵](https://en.wikipedia.org/wiki/Vandermonde_matrix) ，这是一类特殊的矩阵，我们将使用它来获得规范嵌入的逆数。
 
-If you want to run the notebook you can find it in [this Colab notebook](https://colab.research.google.com/drive/1C2WlzTh-28GUxobvIQK6Nj5GdfunAlH2?usp=sharing).
+如果您想运行笔记本，可以在此 Colab 笔记本中找到它。 [this Colab notebook](https://colab.research.google.com/drive/1C2WlzTh-28GUxobvIQK6Nj5GdfunAlH2?usp=sharing).
 
 ## Encoding in CKKS
 
-CKKS exploits the rich structure of integer polynomial rings for its plaintext and ciphertext spaces. Nonetheless, data comes more often in the form of vectors than in polynomials.
+CKKS 利用整数多项式环的丰富结构作为其明文和密文空间。尽管如此，数据更常以向量的形式出现，而不是多项式的形式。
 
-Therefore, it is necessary to encode our input z∈CN/2 into a polynomial m(X)∈Z\[X\]/(XN+1).
+因此，有必要将我们的输入 $z∈CN/2$ 编码为多项式 $m(X)∈Z[X]/(X^N+1)$ 。
 
-We will denote the degree of our polynomial degree modulus by N, which will be a power of 2. We denote the (m)-th [cyclotomic polynomial](https://en.wikipedia.org/wiki/Cyclotomic_polynomial) (note that M\=2N) by ΦM(X)\=XN+1. The plaintext space will be the polynomial ring R\=Z\[X\]/(XN+1). Let us denote by ξM, the M\-th root of unity: ξM\=e2iπ/M.
+我们将用 $N$ 表示多项式次数模 量的次数，这将是 2 的幂。我们用 $\Phi_M(X)=X^N+1$ 表示第 （$m$） 个圆体多项式（请注意 ）。 $M=2N$ 明文空间将是多项式环 $\mathcal{R}=\mathbb{Z}[X]/(X^N+1)$ 。让我们用 $\xi_M$ 表示统一 的第 M -次根： $\xi_M=e^{2i\pi/M}$ 。
 
-To understand how we can encode a vector into a polynomial and how the computation performed on the polynomial will be reflected in the underlying vector, we will first experiment with a vanilla example, where we simply encode a vector z∈CN into a polynomial m(X)∈C\[X\]/(XN+1). Then we will cover the actual encoding of CKKS, which takes a vector z∈CN/2, and encodes it in a polynomial m(X)∈Z\[X\]/(XN+1).
+为了了解我们如何将向量编码为多项式，以及对多项式执行的计算将如何反映在底层向量中，我们将首先尝试一个普通示例，其中我们只需将向量 编码 $z∈\mathbb{C}^N$ 为多项式 $m(X)∈\mathbb{C}[X]/(X^N+1)$ 。然后我们将介绍 CKKS 的实际编码，**它采用一个向量 $z\in\mathbb{C}^{N/2}$ ，并将其编码为多项式 $m(X)∈\mathbb{Z}[X]/(X^N+1)$ 。**
 
 ## Vanilla Encoding
 
-Here we will cover the simple case of encoding z∈CN, into a polynomial m(X)∈C\[X\]/(XN+1).
+在这里，我们将介绍将 $z∈\mathbb{C}^N$ 编码 的简单情况 ，转换为多项式 $m(X)∈\mathbb{C}[X]/(X^N+1)$ 。
 
-To do so, we will use the [canonical embedding](https://en.wikipedia.org/wiki/Embedding) σ:C\[X\]/(XN+1)→CN, which decodes and encodes our vectors.
+为此，我们将使用 规范嵌入 $\sigma:\mathbb{C}[X]/(X^N+1)\to\mathbb{C}^N$ ，它解码和编码我们的向量。
 
-The idea is simple: To decode a polynomial m(X) into a vector z, we evaluate the polynomial on certain values, which will be the roots of the cyclotomic polynomial ΦM(X)\=XN+1. Those N roots are: ξ,ξ3,…,ξ2N–1.
+这个想法很简单：要将多项式 $m(X) $ **解码**为向量 $z$，我们需要在特定值上对该多项式进行求值，这些特定值将是分圆多项式$\Phi_M(X)=X^N+1$的根。这 $N$ 个根分别是：$\xi,\xi^3,\ldots,\xi^{2N-1}$
 
-So to decode a polynomial m(X), we define σ(m)\=(m(ξ),m(ξ3),…,m(ξ2N–1))∈CN. Note that σ defines an isomorphism, which means it is a bijective homomorphism, so any vector will be uniquely encoded into its corresponding polynomial, and vice-versa.
+因此，为了**解码多项式 $m(X)$**，我们定义 $\sigma(m)=(m(\xi),m(\xi^3),\ldots,m(\xi^{2N-1}))\in\mathbb{C}^N.$。注意，$\sigma$定义了一个同构，这意味着它是一个双射同态，因此任何向量都将被唯一编码为其对应的多项式，反之亦然。
 
-The tricky part is the encoding of a vector z∈CN into the corresponding polynomial, which means computing the inverse σ−1. Hence, the problem is to find a polynomial m(X)\=∑N−1i\=0αiXi∈C\[X\]/(XN+1), given a vector z∈CN, such that σ(m)\=(m(ξ),m(ξ3),…,m(ξ2N–1))\=(z1,…,zN).
+>$\sigma$是解码函数
 
-Pursuing this thread further, we end up with the following system:
+棘手的部分在于将向量$z\in\mathbb{C}^N$编码为相应的多项式，这意味着要计算逆映射$\sigma^{-1}$。因此，问题在于，给定一个向量$z\in\mathbb{C}^N$，找到一个多项式$m(X)=\sum_{i=0}^{N-1}\alpha_iX^i\in\mathbb{C}[X]/(X^N+1)$，使得 $\sigma(m)=(m(\xi),m(\xi^3),\ldots,m(\xi^{2N-1}))=(z_1,\ldots,z_N)$。
 
-∑j\=0N−1αj(ξ2i–1)j\=zi,i\=1,…,N.
+进一步沿着这条思路探究，我们最终得到了以下系统：
+$$
+\sum_{j=0}^{N-1}\alpha_j(\xi^{2i-1})^j=z_i,\quad i=1,\ldots,N.
+$$
 
-This can be viewed as a linear equation:
 
-Aα\=z
+这可以看作是一个线性方程：
+$$
+A\alpha=z
+$$
 
-with A the [Vandermonde matrix](https://en.wikipedia.org/wiki/Vandermonde_matrix) of the (ξ2i−1)i\=1,…,N, α the vector of the polynomial coefficients, and z the vector we want to encode.
 
-Therefore we have that: α\=A−1z, and that σ−1(z)\=∑N−1i\=0αiXi∈C\[X\]/(XN+1).
+其中，$A$ 是 $(\xi^{2i-1})_{i=1,\ldots,N}$ 的范德蒙矩阵，$\alpha$ 是多项式系数向量，$z$ 是我们想要编码的向量。
+
+因此，我们有$\alpha=A^{-1}z$ 和 $\sigma^{-1}(z)=\sum_{i=0}^{N-1}\alpha_iX^i\in\mathbb{C}[X]/(X^N+1)$ 
 
 ## Example
 
-Let’s now examine an example to better understand what we have discussed so far.
+现在让我们来看一个例子，以便更好地理解我们到目前为止所讨论的内容。
 
-Let M\=8, N\=M2\=4, ΦM(X)\=X4+1, and ω\=e2iπ8\=eiπ4.  
-Our goal here is to encode the following vectors: \[1,2,3,4\] and \[−1,−2,−3,−4\], decode them, add and multiply their polynomial and decode it.
+设$M=8,N=\frac{M}{2}=4,\Phi_M(X)=X^4+1$和 $\omega=e^{\frac{2i\pi}{8}}=e^{\frac{i\pi}{4}}$
+
+我们这里的目标是对以下向量进行编码：$[1,2,3,4]$
+以及 $[−1,−2,−3,−4]$ ，对它们进行解码，将它们的多项式相加和相乘，然后对结果进行解码。
 
 ![](https://raw.githubusercontent.com/hxd77/BlogImage/master/TyporaImage/20251004224359557.png)
 
 Roots **X**^4 +1 (source: [Cryptography from Rings, HEAT summer school 2016](https://heat-project.eu/School/Chris%20Peikert/slides-heat2.pdf))
 
-As we can see, in order to decode a polynomial, we simply need to evaluate it on powers of an M\-th root of unity. Here we choose ξM\=ω\=eiπ4.
+正如我们所见，为了解码一个多项式，我们只需要在M次单位根的幂上对其进行求值。这里我们选择$\xi_{M}=\omega=e^{\frac{i\pi}{4}}。$
 
-Once we have ξ and M, we can define both σ and its inverse σ−1, respectively the decoding and the encoding.
+一旦我们有了$\xi$和 $M$ ，我们就可以分别定义 $\sigma $及其逆 $σ^{-1}$，即解码和编码。
+
+
 
 ## Implementation
 
