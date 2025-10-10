@@ -1,8 +1,6 @@
-**\*\***This post is part of our [Privacy-Preserving Data Science, Explained](https://blog.openmined.org/private-machine-learning-explained/) series.**\*\***
+## CKKS 系列
 
-## CKKS explained series
-
-Part 1, Vanilla Encoding and Decoding  
+Part 1, 香草编码与解码  
 [Part 2, Full Encoding and Decoding](https://blog.openmined.org/ckks-explained-part-2-ckks-encoding-and-decoding/)  
 [Part 3, Encryption and Decryption](https://blog.openmined.org/ckks-explained-part-3-encryption-and-decryption/)  
 [Part 4, Multiplication and Relinearization](https://blog.openmined.org/ckks-explained-part-4-multiplication-and-relinearization/)  
@@ -456,7 +454,6 @@ class CKKSEncoder:
 encoder = CKKSEncoder(M)
 
 b = np.array([1, 2, 3, 4])
-b
 ```
 
 现在开始编码
@@ -475,7 +472,7 @@ print(p)
 
 ```python
 b_reconstructed = encoder.sigma(p)
-b_reconstructed
+print(b_reconstructed)
 ```
 
 `[1.+1.11022302e-16j 2.+1.11022302e-16j 3.+5.55111512e-17j
@@ -544,15 +541,20 @@ p_add = p1 + p2
 print(p_add)
 ```
 
-`\( x \mapsto (2.0000000000000004 + 1.1102230246251565e-16j) + ((-0.7071067811865477 + 0.707106781186547j)) x + ((2.1094237467877966e-15 - 1.9999999999999996j)) x^2 + ((0.7071067811865466 + 0.707106781186549j)) x^3 \)`
+`(1.9999999999999996+2.220446049250313e-16j) -
+(0.7071067811865468-0.7071067811865475j) x -
+(2.2204460492503096e-16+1.9999999999999987j) x**2 +
+(0.7071067811865461+0.7071067811865469j) x**3`
 
 不出所料，这里我们看到 $p1+p2$ 能正确解码为 $[2,0,6,0]$。
 
 ```python
-encoder.sigma(p_add)
+p_add_reconstructed=encoder.sigma(p_add)
+print(p_add_reconstructed)
 ```
 
-`array([2.0000000e+00 + 3.25176795e-17j, 4.4408921e-16 - 4.44089210e-16j, 6.0000000e+00 + 1.11022302e-16j, 4.4408921e-16 + 3.33066907e-16j])`
+`[ 2.0000000e+00-9.19738868e-17j -8.8817842e-16+2.22044605e-16j
+  6.0000000e+00+2.22044605e-16j -4.4408921e-16+0.00000000e+00j]`
 
 因为在进行乘法运算时，我们可能会遇到次数高于 $N$ 的项，所以需要使用$X^N+1$来进行模运算。
 
@@ -569,21 +571,27 @@ print(poly_modulo)
 >1 + x^4
 >$$
 
-`\( x \mapsto 1.0 + 0.0x + 0.0x^2 + 0.0x^3 + 1.0x^4 \)`
+`1.0 + 0.0 x + 0.0 x**2 + 0.0 x**3 + 1.0 x**4`
 
 现在我们可以进行乘法运算了。
 
 ```python
 p_mult = p1 * p2 % poly_modulo
+print(p_mult)
 ```
+
+`[  1.+7.21644966e-16j  -4.+8.32667268e-16j   9.-5.27355937e-15j
+ -16.-2.60902411e-15j]`
 
 最后，如果我们对其进行解码，就能看到我们得到了预期的结果。
 
 ```python
-encoder.sigma(p_mult)
+p_mult=encoder.sigma(p_mult)
+print(p_mult)
 ```
 
-`array([ 1. - 8.67361738e-16j, -4. + 6.86950496e-16j, 9. + 6.86950496e-16j, -16. - 9.08301212e-15j])`
+`[  1.+7.21644966e-16j  -4.+8.32667268e-16j   9.-5.27355937e-15j
+ -16.-2.60902411e-15j]`
 
 >### 加法同态（很直接）
 >
