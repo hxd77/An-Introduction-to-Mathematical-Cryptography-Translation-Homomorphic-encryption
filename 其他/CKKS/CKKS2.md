@@ -238,9 +238,9 @@
     >* 定义投影 $\pi:\mathbb{H}\to\mathbb{C}^{N/2}$ 为“取前半段”，即 $\pi(Z)=(Z_0,\dots,Z_{N/2-1})，v=(Z_0,\dots,Z_{N/2-1)})$.
     >  
     >* 它的一个逆（扩展）$\pi^{-1}:\mathbb{C}^{N/2}\to\mathbb{H}$ 可以自然定义为：
-    >  $$
+    > $$
     >    \pi^{-1}(v) = Z,\quad\text{其中 } Z_j = v_j \ (0\le j < N/2),\quad Z_{-j} = \overline{v_j}.(-j\equiv N-j(\mod N))
-    >    $$
+    > $$
     >    也就是说：把你给的 $N/2$ 个复数放到向量的前半部分，后一半填入对应的共轭值。结果显然满足 $Z\in\mathbb{H}$。
     >    
     >
@@ -529,9 +529,9 @@
     
     ## Implementation
     
-    Now that we finally managed to see how the full CKKS encoding and decoding works, let’s implement it! We will use the code we previously used for the Vanilla Encoder and Decoder. The code is available on [this Colab notebook](https://colab.research.google.com/drive/1cdue90Fg_EB5cxxTYcv2_8_XxQnpnVWg?usp=sharing).
+    既然我们终于弄清楚了完整的CKKS编码和解码是如何工作的，那我们就来实现它吧！我们将使用之前用于Vanilla编码器和解码器的代码。该代码可在这个[Colab](https://colab.research.google.com/drive/1cdue90Fg_EB5cxxTYcv2_8_XxQnpnVWg?usp=sharing)笔记本中获取。
     
-    For the rest of the article, let’s refactor and build on top of the `CKKSEncoder` class we have created from the previous post. In a notebook environment, instead of redefining the class each time we want to add or change methods, we will simply use `patch_to` from the `fastcore` package from [Fastai](https://github.com/fastai/fastai). This allows us to monkey patch objects that have already been defined. Using `patch_to` is purely for convenience and you could just redefine the `CKKSEncoder` at each cell with the added methods.
+    在本文的其余部分，让我们基于上一篇文章中创建的`CKKSEncoder`类进行重构和扩展。在笔记本环境中，为了避免每次想要添加或修改方法时都重新定义该类，我们将直接使用`Fastai`的`fastcore`包中的 `patch_to` 。这使我们能够对已定义的对象进行猴子补丁（动态修改）。使用 `patch_to` 纯粹是为了方便，你也可以在每个单元格中重新定义带有新增方法的 `CKKSEncoder`。
     
     ```python
     # !pip3 install fastcore
