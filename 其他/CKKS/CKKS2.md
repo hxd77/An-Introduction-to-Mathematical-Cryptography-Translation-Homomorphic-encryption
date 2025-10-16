@@ -1,5 +1,5 @@
 *   **\*\***This post is part of our [Privacy-Preserving Data Science, Explained](https://blog.openmined.org/private-machine-learning-explained/) series.**\*\***
-    
+  
     ## CKKS explained series
     
     [Part 1, Vanilla Encoding and Decoding](https://blog.openmined.org/ckks-explained-part-1-simple-encoding-and-decoding/)  
@@ -243,7 +243,6 @@
     > $$
     >    也就是说：把你给的 $N/2$ 个复数放到向量的前半部分，后一半填入对应的共轭值。结果显然满足 $Z\in\mathbb{H}$。
     >    
-    >
     >**举例（$N=8$）**：若 $v=(a,b,c,d)$（长度 $4$），则
     >$$
     >\pi^{-1}(v) = Z=(a,b,c,d,\overline{d},\overline{c},\overline{b},\overline{a}).\\v=(Z_0,\dots,Z_{N/2-1)})=(a,b,c,d)
@@ -299,9 +298,9 @@
     >| ℍ                           | 满足共轭对称的所有复向量 | ❌ 不可数的（因为包含连续复数） |
     >
     
-    这一细节很重要，因为它意味着我们必须找到一种方法将$\pi^{-1}(z)$投影到$σ(\mathcal{R})$上。为了实现这一点，我们将使用一种名为“按坐标随机舍入”的技术，该技术在《环-LWE密码学工具包》（https://web.eecs.umich.edu/~cpeikert/pubs/toolkit.pdf）中有定义。这种舍入技术能够将实数$x$舍入到$\lfloor x\rfloor$ 或 $\lfloor x\rfloor+1$，且$x$ 越接近$\lfloor x\rfloor$ 或 $\lfloor x\rfloor+1$，舍入到对应值的概率就越高。我们不会深入探讨该算法的细节，但会对其进行实现。
+    这一细节很重要，因为它意味着我们必须找到一种方法将$\pi^{-1}(z)$投影到$σ(\mathcal{R})$上。为了实现这一点，我们将使用一种名为“按坐标随机舍入”的技术，该技术在[《环-LWE密码学工具包》](https://web.eecs.umich.edu/~cpeikert/pubs/toolkit.pdf)中有定义。这种舍入技术能够将实数$x$舍入到$\lfloor x\rfloor$ 或 $\lfloor x\rfloor+1$，且$x$ 越接近$\lfloor x\rfloor$ 或 $\lfloor x\rfloor+1$，舍入到对应值的概率就越高。我们不会深入探讨该算法的细节，但会对其进行实现。
     
-    这个想法很简单，$\mathcal{R}$ 有一个正交 $\mathbb{Z}\text{ -基}\left\{1,X,\ldots,X^{N-1}\right\}$，并且由于$σ$是一个同构映射，$σ(\mathcal{R})$ 有一个正交 $\mathbb{Z}\text{ -基 }\beta=(b_1,b_2,\ldots,b_N)=(\sigma(1),\sigma(X),\ldots,\sigma(X^{N-1}))\mathrm{~。}$。因此，对于任意 $z\in\mathbb{H}$，我们只需将其投影到 $β$ 上：
+    这个想法很简单，$\mathcal{R}$ 有一个正交 $\mathbb{Z}\text{ -基}\left\{1,X,\ldots,X^{N-1}\right\}$，并且由于$σ$是一个同构映射，$σ(\mathcal{R})$ 有一个正交 $\mathbb{Z}\text{ -基 }\beta=(b_1,b_2,\ldots,b_N)=(\sigma(1),\sigma(X),\ldots,\sigma(X^{N-1}))\mathrm{~。}$因此，对于任意 $z\in\mathbb{H}$，我们只需将其投影到 $β$ 上：
     
     $$
     \begin{gathered}\\z=\sum_{i=1}^Nz_ib_i\text{ ,与 }z_i=\frac{\langle z,b_i\rangle}{\left\|b_i\right\|^2}\in\mathbb{R}\mathrm{~。}\end{gathered}
@@ -335,6 +334,83 @@
     >  
     >* 它们彼此线性无关。
     >  
+    
+    >#### 🧩 三、举个小例子（非常直观）
+    >
+    >设 $N=4$，那么：
+    >
+    >$$
+    >\mathcal{R} = \mathbb{Z}[X]/(X^4 + 1)
+    >$$
+    >并且  
+    >$$
+    >\omega = e^{i\pi/4}
+    >$$
+    >我们要取奇数次根：
+    >
+    >$$
+    >\xi_1 = \omega^1 = e^{i\pi/4},\quad  
+    >\xi_3 = e^{3i\pi/4},\quad  
+    >\xi_5 = e^{5i\pi/4},\quad  
+    >\xi_7 = e^{7i\pi/4}.
+    >$$
+    >现在看这几个 σ 映射：
+    >
+    >| 多项式 $f(X)$ | 映射后 $σ(f)$（在不同根的取值） |
+    >| :-----------: | :-----------------------------: |
+    >|      $1$      |         $(1, 1, 1, 1)$          |
+    >|      $X$      |     $(ξ_1, ξ_3, ξ_5, ξ_7)$      |
+    >|     $X^2$     | $(ξ_1^2, ξ_3^2, ξ_5^2, ξ_7^2)$  |
+    >|     $X^3$     | $(ξ_1^3, ξ_3^3, ξ_5^3, ξ_7^3)$  |
+    >
+    >这就是：
+    >
+    >$$
+    >\beta = (\sigma(1), \sigma(X), \sigma(X^2), \sigma(X^3))
+    >$$
+    >也就是一个矩阵的列：
+    >
+    >| 行/列 | σ(1) | σ(X) | σ(X²) | σ(X³) |
+    >| :---: | :--: | :--: | :---: | :---: |
+    >| row0  |  1   |  ξ₁  |  ξ₁²  |  ξ₁³  |
+    >| row1  |  1   |  ξ₃  |  ξ₃²  |  ξ₃³  |
+    >| row2  |  1   |  ξ₅  |  ξ₅²  |  ξ₅³  |
+    >| row3  |  1   |  ξ₇  |  ξ₇²  |  ξ₇³  |
+    >
+    >* * *
+    >
+    >#### 📐 四、为什么叫“基”？
+    >
+    >因为在 $σ(\mathcal{R})$ 空间里，  
+    >任何 σ 映射得到的向量都能唯一写成这些列向量的整数线性组合。
+    >
+    >也就是说：
+    >
+    >$$
+    >z = c_0 \sigma(1) + c_1 \sigma(X) + c_2 \sigma(X^2) + c_3 \sigma(X^3)
+    >$$
+    >就像在 $\mathbb{R}^4$ 里你可以写：
+    >
+    >$$v = c_0 e_1 + c_1 e_2 + c_2 e_3 + c_3 e_4$$
+    >
+    >一样。
+    >
+    >* * *
+    >
+    >#### 🧠 五、通俗比喻
+    >
+    >* 在原来的多项式世界 $\mathcal{R}$ 中：
+    >  
+    >    $$\text{基底是 } \{1, X, X^2, X^3\}$$
+    >* 在 σ 映射后的“复数世界” $σ(\mathcal{R})$ 中：
+    >  
+    >    $$\text{基底变成了 } \{\sigma(1), \sigma(X), \sigma(X^2), \sigma(X^3)\}$$
+    >
+    >就像你从直角坐标系变换到一个新的坐标系一样，  
+    >σ 就是那个“变换矩阵”。
+    >
+    >* * *
+    >
     >
     
     >#### 🧮 一、为什么它们是正交的
@@ -468,7 +544,7 @@
     >
     >#### 🧮 4️⃣ 用你的例子来直观理解
     >
-    >> “假设你要对 $x=1.4$ 进行舍入，且不想将其舍入到最接近的整数，而是舍入到最接近的 $0.25$ 的倍数以保留一定精度。”
+    >> “**假设你要对 $x=1.4$ 进行舍入，且不想将其舍入到最接近的整数，而是舍入到最接近的 $0.25$ 的倍数以保留一定精度。**”
     >
     >👉 我们希望结果只能是：
     >
@@ -541,28 +617,78 @@
     
     ```python
     @patch_to(CKKSEncoder)
-    def pi(self, z: np.array) -> np.array:
-        """Projects a vector of H into C^{N/2}."""
-    
-        N = self.M // 4
-        return z[:N]
+    def pi(self,z:np.array)->Polynomial:
+        """pi:将H向量投影到C^{N/2}中。因为M=2N,所以M/4=N/2"""
+        N2=self.M//4
+        return z[:N2]
     
     @patch_to(CKKSEncoder)
-    def pi_inverse(self, z: np.array) -> np.array:
-        """Expands a vector of C^{N/2} by expanding it with its
-        complex conjugate."""
+    def pi_inverse(self,z:np.array)->np.array:
+        """通过用其复共轭对一个C^{N/2}向量进行扩展，从而将该向量展开。"""
     
-        z_conjugate = z[::-1]
-        z_conjugate = [np.conjugate(x) for x in z_conjugate]
-        return np.concatenate([z, z_conjugate])
+        z_conjugate=z[::-1]#翻转z
+        z_conjugate=[np.conjugate(x) for x in z_conjugate]#取共轭
+        return np.concatenate((z,z_conjugate))#拼接
     
-    # We can now initialize our encoder with the added methods
-    encoder = CKKSEncoder(M)
+    #现在我们可以用添加的方法来初始化编码器了
+    M=8
+    encoder=CKKSEncoder(M)
     ```
     
+    >### 🧩 代码解析
+    >
+    >```python
+    >z_conjugate = z[::-1]              # ① 反转 z
+    >z_conjugate = [np.conjugate(x) for x in z_conjugate]  # ② 取共轭
+    >return np.concatenate((z, z_conjugate))               # ③ 拼接
+    >```
+    >
+    >* * *
+    >
+    >#### 🧠 第一步：`z_conjugate = z[::-1]`
+    >
+    >➡ 把数组 `z` 反转顺序。
+    >
+    >例如：
+    >
+    >```python
+    >z = [1+2j, 3+4j, 5+6j]
+    >z_conjugate = z[::-1]
+    ># => [5+6j, 3+4j, 1+2j]
+    >```
+    >
+    >* * *
+    >
+    >#### 🧠 第二步：`z_conjugate = [np.conjugate(x) for x in z_conjugate]`
+    >
+    >➡ 对反转后的每个复数取**共轭**。
+    >
+    >复数共轭定义：  
+    >若 $x = a + bj$，则 $\overline{x} = a - bj$。
+    >
+    >所以：
+    >
+    >```python
+    >z_conjugate = [np.conjugate(x) for x in z_conjugate]
+    ># => [5-6j, 3-4j, 1-2j]
+    >```
+    >
+    >* * *
+    >
+    >#### 🧠 第三步：`np.concatenate((z, z_conjugate))`
+    >
+    >➡ 把原数组 `z` 和它的**反序共轭**拼接在一起。
+    >
+    >结果是一个长度翻倍的新数组：
+    >
+    >```python
+    >np.concatenate((z, z_conjugate))
+    ># => [1+2j, 3+4j, 5+6j, 5-6j, 3-4j, 1-2j]
+    >```
+    
     ```python
-    z = np.array([0,1])
-    encoder.pi_inverse(z)
+    z=np.array([0,1])#N2=N/2=2 
+    print(encoder.pi_inverse(z))
     ```
     
     `array([0, 1, 1, 0])`
@@ -570,45 +696,67 @@
     ```python
     @patch_to(CKKSEncoder)
     def create_sigma_R_basis(self):
-        """Creates the basis (sigma(1), sigma(X), ..., sigma(X** N-1))."""
+        #创建基（sigma(1)，sigma(X)，…，sigma(X**N-1)）。
+        self.sigma_R_basis=np.array((self.vandermonde(self.xi,self.M))).T
+        """
+        [[1, ξ1, ξ1^2, ..., ξ1^(N/2-1)],
+        [1, ξ3, ξ3^2, ..., ξ3^(N/2-1)],
+        ...].T代表转置
     
-        self.sigma_R_basis = np.array(self.vandermonde(self.xi, self.M)).T
+        """
     
     @patch_to(CKKSEncoder)
-    def __init__(self, M):
-        """Initialize with the basis"""
-        self.xi = np.exp(2 * np.pi * 1j / M)
-        self.M = M
-        self.create_sigma_R_basis()
+    def __init__(self,M):
+        """初始化基"""
+        self.xi=np.exp(2*np.pi*1j/M)
+        self.M=M
+        self.create_sigma_R_basis()  
     
-    encoder = CKKSEncoder(M)
+    #现在我们可以用添加的方法来初始化编码器了
+    M=8
+    encoder=CKKSEncoder(M)
     ```
     
-    We can now have a look at the basis σ(1),σ(X),σ(X2),σ(X3).
+    现在我们可以来看一下基 $σ(1)、σ(X)、σ(X²)、σ(X³)$。
     
     ```python
-    encoder.sigma_R_basis
+    print(encoder.sigma_R_basis)
     ```
     
     `array([[ 1.00000000e+00+0.j, 1.00000000e+00+0.j, 1.00000000e+00+0.j, 1.00000000e+00+0.j],   [ 7.07106781e-01+0.70710678j, -7.07106781e-01+0.70710678j, -7.07106781e-01-0.70710678j, 7.07106781e-01-0.70710678j],   [ 2.22044605e-16+1.j, -4.44089210e-16-1.j, 1.11022302e-15+1.j, -1.38777878e-15-1.j],   [-7.07106781e-01+0.70710678j, 7.07106781e-01+0.70710678j, 7.07106781e-01-0.70710678j, -7.07106781e-01-0.70710678j]])`
     
-    Here we will check that elements of Z({σ(1),σ(X),σ(X2),σ(X3)}) are encoded as integer polynomials.
+    在这里，我们将验证$Z({σ(1),σ(X),σ(X²),σ(X³)})$的元素是否被编码为整系数多项式。
     
     ```python
-    # Here we simply take a vector whose coordinates are (1,1,1,1) in the lattice basis
-    coordinates = [1,1,1,1]
+    coordinates=[1,1,1,1]
+    print(encoder.sigma_R_basis.T)
+    print(encoder.sigma_R_basis)
+    b=np.matmul(encoder.sigma_R_basis.T,coordinates)
+    """
+    矩阵乘向量按 **行向量 dot 坐标向量**：
     
-    b = np.matmul(encoder.sigma_R_basis.T, coordinates)
-    b
+    $$b_i = \sum_{j=0}^{3} (\sigma\_R\_basis.T)_{ij} \cdot coordinates[j]$$
+    代入你给的矩阵和 `[1,1,1,1]`：
+    * **行 0**：
+    $$b_0 = 1\cdot 1 + ξ_1\cdot 1 + ξ_1^2\cdot 1 + ξ_1^3\cdot 1 = 1 + ξ_1 + ξ_1^2 + ξ_1^3$$
+    * **行 1**：
+    $$b_1 = 1 + ξ_3 + ξ_3^2 + ξ_3^3$$
+    * **行 2**：
+    $$b_2 = 1 + ξ_5 + ξ_5^2 + ξ_5^3$$
+    * **行 3**：
+    $$b_3 = 1 + ξ_7 + ξ_7^2 + ξ_7^3$$
+    所以 `b` 就是 **每一行元素的和**，每行和对应一个复数。
+    """
+    print(b)
     ```
     
     `array([1.+2.41421356j, 1.+0.41421356j, 1.-0.41421356j, 1.-2.41421356j])`
     
-    We can check now that it does encode to an integer polynomial.
+    我们现在可以验证它确实能编码为一个整系数多项式。
     
     ```python
     p = encoder.sigma_inverse(b)
-    p
+    print(p)
     ```
     
     `x↦(1+2.220446049250313e-16j)+((1+0j))x+((0.9999999999999998+2.7755575615628716e-17j))x^2+((1+2.220446049250313e-16j))x^3`
@@ -646,7 +794,7 @@
     encoder = CKKSEncoder(M)
     ```
     
-    Finally, because there might be loss of precision during the rounding step, we use the scale parameter Δ to achieve a fixed level of precision.
+    最后，由于在舍入步骤中可能会有精度损失，我们使用尺度参数 $Δ$ 来达到固定的精度水平。
     
     ```python
     @patch_to(CKKSEncoder)
@@ -686,7 +834,7 @@
     encoder = CKKSEncoder(M, scale)
     ```
     
-    We can now see it in action, the full encoder used by CKKS:
+    我们现在可以看到它的实际应用了，这是CKKS所使用的完整编码器：
     
     ```python
     z = np.array([3 +4j, 2 - 1j])
@@ -695,7 +843,7 @@
     
     `array([3.+4.j, 2.-1.j])`
     
-    Now we have an integer polynomial as our encoding.
+    现在我们有一个整数多项式作为我们的编码。
     
     ```python
     p = encoder.encode(z)
@@ -704,7 +852,7 @@
     
     `x↦160.0+90.0x+160.0x^2+45.0x^3`
     
-    And it actually decodes well!
+    而且它实际上解码效果很好！
     
     ```python
     encoder.decode(p)
@@ -712,4 +860,4 @@
     
     `array([2.99718446+3.99155337j, 2.00281554-1.00844663j])`
     
-    I hope you enjoyed this little introduction to encoding complex numbers into polynomials for homomorphic encryption. We will deep dive into this further in the following articles, so stay tuned!
+    

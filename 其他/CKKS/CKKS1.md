@@ -416,7 +416,7 @@ class CKKSEncoder:
         A=CKKSEncoder.vandermonde(self.xi,M)
 
         #然后我们求解这个方程组
-        coeffs=np.linalg.solve(A,b)#求解Ax=b 这里求解出alpha
+        coeffs=np.linalg.solve(A,b)#求解Ax=b 这里求解出alpha=(a0,a1,a2,a3)，可以构造多项式
         """
         例如：
         2x+y=8
