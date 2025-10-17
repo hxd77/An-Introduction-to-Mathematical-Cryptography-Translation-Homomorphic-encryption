@@ -12,7 +12,7 @@ Part 5, Rescaling  第 5 部分，重新缩放
 
 ## Introduction  介绍
 
-在CKKS解释的上一篇文章《第4部分：乘法与重线性化》（https://blog.openmined.org/ckks-explained-part-4-multiplication-and-relinearization/）中，我们了解了密文乘法在CKKS中是如何工作的，为什么我们需要对输出进行重线性化以保持恒定的密文大小，以及如何进行重线性化。
+在CKKS解释的上一篇文章[《第4部分：乘法与重线性化》](https://blog.openmined.org/ckks-explained-part-4-multiplication-and-relinearization)中，我们了解了密文乘法在CKKS中是如何工作的，为什么我们需要对输出进行重线性化以保持恒定的密文大小，以及如何进行重线性化。
 
 尽管如此，我们将会看到，我们需要一种名为重新缩放的最终操作来处理噪声并避免溢出。这将是本系列的最后一篇理论文章，而在下一篇也是最后一篇文章中，我们将用Python实现所有内容！
 
@@ -24,64 +24,49 @@ Part 5, Rescaling  第 5 部分，重新缩放
 
 你可以把这想象成一个油箱。起初，油箱里装满了汽油，但随着你执行越来越多的操作，油箱会被耗尽，直到汽油耗尽，你就再也做不了任何事了。分级同态加密方案也是如此：你一开始有一定量的“汽油”，但随着你进行乘法运算，“汽油”会越来越少，直到耗尽，这时你就再也无法执行任何操作了。
 
-下图说明了这一点。开始时，你的油箱是满的。但当你进行乘法运算和重新缩放时，你会降低等级，这相当于消耗了一些汽油。因此，如果你从L个等级开始，记为（qₗ，qₗ₋₁，…，q₁），处于等级qₗ意味着你还剩下l次乘法运算，而执行一次乘法运算会将等级从qₗ降至qₗ₋₁。
+下图说明了这一点。开始时，你的油箱是满的。但当你进行乘法运算和重新缩放时，你会降低等级，这相当于消耗了一些汽油。因此，如果你从 $L$ 个等级开始，记为$(q_L,q_{L-1},\ldots,q_1)$，处于等级 $q_l$ 意味着你还剩下 $l$ 次乘法运算，而执行一次乘法运算会将等级从 $q_{l}$ 降至$q_{l-1}$。
 
 ![](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/rescaling.png)
 
 Rescaling explained  重新缩放解释
 
-Now once you run out of gas, as in real life it is possible to fill your tank to be able to go farther down the road. This operation is called bootstrapping and we will not cover it in this article. So if we assume that we do not have the possibility to refill the gas tank, there is one interesting aspect one must take into account when using leveled homomorphic encryption scheme: **you need to know the amount of multiplications you will do in advance!**  
-现在，一旦汽油耗尽，就像在现实生活中一样，你可以加满油箱，以便继续行驶。此操作称为引导，本文将不予介绍。因此，如果我们假设没有可能重新加满油箱，那么在使用分级同态加密方案时必须考虑一个有趣的方面：你需要提前知道要进行的乘法运算次数！
+就像在现实生活中一样，一旦你的汽油耗尽，你可以给油箱加油，以便能沿着道路行驶得更远。这种操作被称为“自举”，我们在本文中不会涉及这部分内容。所以，如果我们假设无法给油箱加油，那么在使用分级同态加密方案时，有一个有趣的方面是必须考虑的：你需要提前知道你将要进行的乘法运算的次数！
 
-Indeed, just like in real life, if you plan to travel quite far, you will need to have more gas than if you simply go around your neighborhood. The same applies here, and depending on how many multiplications you will need to perform, you will have to adjust the size of your tank. But the bigger the tank, the heavier the computations, and also the less secure your parameters are. Indeed, just like in real life, if you need a bigger tank, the heavier it will be, and it will make things slower, as well as making it less secure.  
-确实，就像在现实生活中一样，如果你计划长途旅行，你需要的汽油量会比在附近转悠时更多。同样的道理也适用于此，你需要根据乘法运算的次数来调整油箱容量。油箱越大，计算量就越大，参数的安全性也就越低。确实，就像在现实生活中一样，如果你需要更大的油箱，它就会越重，速度也会变慢，安全性也会降低。
+的确，就像在现实生活中一样，如果你计划去很远的地方旅行，你需要的汽油会比只是在小区周边转悠要多。这里的情况也是如此，根据你需要执行的乘法运算次数，你必须调整“油箱”的大小。但油箱越大，计算量就越繁重，而且你的参数安全性也会越低。的确，就像在现实生活中一样，如果你需要一个更大的油箱，它就会更重，这会让事情变慢，同时也会降低其安全性。
 
-We will not go into all the details, but know that the hardness of the CKKS scheme is based on the ratio Nq, with N the degree of our polynomials, i.e. the size of our vectors, and q the coefficient modulus, i.e. our gas tank.  
-我们不会讨论所有细节，但要知道 CKKS 方案的硬度基于比率 Nq ，其中 N 是多项式的次数，即向量的大小， q 是系数模量，即油箱。
+我们不会深入所有细节，但要知道CKKS方案的安全性基于 $\frac{N}q$比率，其中 $N$ 是我们多项式的次数，即向量的大小，而 $q$ 是系数模数，即我们的“油箱”。
 
-Therefore, the more multiplications we need, the bigger the gas tank, and therefore our parameters become less secure. To maintain the same level of security we then need to increase N, which will increase the computational cost of our operations.  
-因此，我们需要的乘法运算越多，油箱就越大，我们的参数就越不安全。为了保持相同的安全级别，我们需要增加 N ，这会增加运算的计算成本。
+因此，我们需要进行的乘法运算越多，“油箱”就越大，因此我们的参数安全性就会降低。为了维持相同的安全级别，我们就需要增大 $N$ ，而这会增加我们运算的计算成本。
 
-The following figure, from the [Microsoft Private AI Bootcamp](https://www.youtube.com/watch?v=SEBdYXxijSo), shows this tradeoff that one must consider when using CKKS. To guarantee 128 bits of security, we must increase the polynomial degree, even if we do not need the extra slots it provides, as the increased modulo could make our parameters insecure.  
-下图来自微软私有 AI 训练营，展示了使用 CKKS 时必须考虑的权衡。为了保证 128 位的安全性，我们必须增加多项式的次数，即使我们不需要它提供的额外槽位，因为增加的模数可能会使我们的参数变得不安全。
+下图来自微软私人人工智能训练营，展示了使用CKKS时必须考虑的这种权衡。为了保证128位的安全性，我们必须提高多项式的阶数，即使我们并不需要它提供的额外插槽，因为增大的模数可能会使我们的参数不安全。
 
 ![](https://cdn.jsdelivr.net/gh/hxd77/BlogImage/Blog/security_params.png)
 
 Security as a function of polynomial degree and modulo  
 安全性是多项式度和模的函数
 
-So before we move on to the more theoretical part, let’s see what are the key takeaways:  
-因此，在我们进入更理论的部分之前，让我们先看看关键要点是什么：
+那么在我们进入更具理论性的部分之前，让我们来看看主要的收获是什么：
 
-- Rescaling and noise management can be seen as managing a gas tank: you start with an initial budget that will decrease the more you use it. If you run out of gas, you can’t do anything anymore.  
-  重新缩放和噪声管理可以看作是管理油箱：你一开始有一个初始预算，随着使用的次数增加，预算就会减少。如果油用完了，你就什么也做不了了。
-- You need to know in advance how many multiplications you will do, which will determine the size of the gas tank, which will impact the size of the polynomial degree you will use.  
-  您需要提前知道要进行多少次乘法，这将决定油箱的大小，这将影响您将使用的多项式次数的大小。
+- 重新调整规模和噪声管理可以被看作是管理一个油箱：你从初始预算开始，使用得越多，预算就会越少。如果油用完了，你就再也做不了任何事情了。
+- 你需要提前知道将要进行多少次乘法运算，这会决定“油箱”的大小，而“油箱”的大小又会影响你将使用的多项式的次数。
 
 ## Context  语境
 
-So now that we see the high-level picture, let’s dig into the why and how it all works.  
-现在我们已经了解了总体情况，让我们深入研究一下这一切的原理和运作方式。
+既然我们现在已经了解了大致情况，那就让我们深入探究这一切的原因和运作方式吧。
 
-If you remember correctly from the [Part 2 about encoding](https://blog.openmined.org/ckks-explained-part-2-ckks-encoding-and-decoding/), if we had an initial vector of values z, it is multiplied by a scale Δ during encoding to keep some level of precision.  
-如果您没有记错第 2 部分关于编码的内容，那么如果我们有一个初始值向量 z ，则在编码过程中将其乘以比例 Δ 以保持一定程度的精度。
+如果你对第二部分关于编码的内容记得没错的话，若我们有一个初始值向量 $z$ ，在编码过程中会将其乘以一个缩放因子 $Δ$ ，以保持一定程度的精度。
 
-So the underlying value contained in the plaintext μ and ciphertext c is Δ⋅z. The problem is that when we multiply two ciphertexts c,c′, the result holds the value z⋅z′⋅Δ2. So it contains the square of the scale, which might lead to overflow after a few multiplications as the scale might grow exponentially. Moreover, as we saw before, the noise increases after each multiplication.  
-因此，明文 μ 和密文 c 中包含的底层值是 Δ⋅z 。问题在于，当我们将两个密文 c,c′ 相乘时，结果为 z⋅z′⋅Δ2 。因此，它包含了比例的平方，由于比例可能呈指数增长，几次乘法运算后可能会导致溢出。此外，正如我们之前所见，噪声在每次乘法运算后都会增加。
+因此，明文 $μ$ 和密文 $c$ 中包含的基础值是 $Δ⋅z$ 。问题在于，当我们将两个密文 $c$ 和 $c^\prime$ 相乘时，结果的值为 $z⋅z^\prime⋅Δ²$。这其中包含了缩放因子的平方，由于缩放因子可能会呈指数级增长，经过几次乘法运算后可能会导致溢出。此外，正如我们之前所看到的，每次乘法运算后，噪声都会增加。
 
-Therefore, the rescaling operation’s goal is to actually **keep the scale constant, and also reduce the noise present in the ciphertext.**  
-因此，重新缩放操作的目标实际上是保持比例不变，同时减少密文中的噪声。
+因此，重缩放操作的目标实际上是保持规模恒定，同时减少密文中存在的噪声。
 
 ## Vanilla solution  香草溶液
 
-So how can we solve this problem? Well, to do so we need to see how to define q. Remember that this parameter q is used as the modulo of the coefficients in our polynomial ring Rq\=Zq\[X\]/(XN+1).  
-那么我们该如何解决这个问题呢？首先，我们需要了解如何定义 q 。记住，这个参数 q 是多项式环 Rq\=Zq\[X\]/(XN+1) 中系数的模。
+那么我们该如何解决这个问题呢？要解决这个问题，我们需要了解如何定义 $q$。 请记住，这个参数 $q$ 被用作我们多项式环$\mathcal{R}_q=\mathbb{Z}_q[X]/(X^N+1)$中系数的模。
 
-As described in the high-level view, q will be used as a gas tank that we will progressively empty for our operations.  
-正如在高层视图中所描述的， q 将用作油箱，我们将逐步清空油箱以供操作使用。
+正如在概览中所描述的，$q$ 将被用作一个油箱，我们会在操作过程中逐渐将其排空。
 
-If we suppose we must do L multiplications, with a scale Δ, then we will define q as:  
-如果我们假设必须进行 L 次乘法，其比例为 Δ ，那么我们将 q 定义为：  
+如果我们假设必须进行 $L$ 次乘法运算，且其规模为 $Δ$ ，那么我们将把 $q$ 定义为： 
 q\=ΔL⋅q0  
 with q0≥Δ, which will dictate how many bits we want before the decimal part. Indeed, if we suppose we want 30 bits of precision for the decimal part, and 10 bits of precision for the integer part, we will set:  
 设置为 q0≥Δ ，这将决定小数部分前需要多少位。例如，假设小数部分需要 30 位精度，整数部分需要 10 位精度，则需要设置：  
@@ -143,25 +128,3 @@ RSl→l−1(c)\=⌊ql−1qlc⌉ (mod ql−1)\=⌊p−1lc⌉ (mod ql−1)
 So we have seen in this article what is rescaling, why we need it, and how one could implement it in practice. In the next and last article we will put everything together and code a CKKS-like homomorphic encryption scheme ourselves in Python!  
 我们已经在本文中了解了什么是重新缩放，为什么需要它，以及如何在实践中实现它。在下一篇也是最后一篇文章中，我们将把所有内容整合在一起，并用 Python 编写一个类似 CKKS 的同态加密方案！
 
-Category:
-
-  类别：研究
-
-Topics:
-
-主题：同态加密（HE）、Cheon-Kim-Kim-Song（CKKS）、隐私增强技术（PET）
-
-- October 6, 2025  2025 年 10 月 6 日
-- [research  研究](https://openmined.org/blog/category/research/)
-- [policy  政策](https://openmined.org/blog/category/policy/)
-
-###### Unlocking a Million Times More Data for AI Through Attribution-Based Control
-
-通过基于归因的控制为人工智能解锁百万倍的数据
-
-- October 6, 2025  2025 年 10 月 6 日
-- [research  研究](https://openmined.org/blog/category/research/)
-
-###### The Bitter Lesson’s Bitter Lesson
-
-惨痛教训的惨痛教训
