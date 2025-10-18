@@ -67,64 +67,55 @@ Security as a function of polynomial degree and modulo
 正如在概览中所描述的，$q$ 将被用作一个油箱，我们会在操作过程中逐渐将其排空。
 
 如果我们假设必须进行 $L$ 次乘法运算，且其规模为 $Δ$ ，那么我们将把 $q$ 定义为： 
-q\=ΔL⋅q0  
-with q0≥Δ, which will dictate how many bits we want before the decimal part. Indeed, if we suppose we want 30 bits of precision for the decimal part, and 10 bits of precision for the integer part, we will set:  
-设置为 q0≥Δ ，这将决定小数部分前需要多少位。例如，假设小数部分需要 30 位精度，整数部分需要 10 位精度，则需要设置：  
-Δ\=230,q0\=2\\# bits integer⋅2\\# bits decimal\=210+30\=240
+$$
+q=\Delta^L\cdot q_0
+$$
 
-Once we have set the precision we want for the integer and decimal parts, chosen the number L of multiplications we want to perform, and set q accordingly, it is pretty easy to define the rescaling operation: we simply divide and round our ciphertext.  
-一旦我们设置了整数和小数部分所需的精度，选择了要执行的乘法次数 L ，并相应地设置了 q ，定义重新缩放操作就非常容易了：我们只需对密文进行除法和四舍五入即可。
+其中 $q_0≥Δ$，这将决定我们希望在小数部分之前有多少位。实际上，如果我们假设希望小数部分有 $30$ 位精度，整数部分有 $10$ 位精度，我们会设置：
+$$
+\Delta=2^{30},\quad q_0=2^{\backslash\#\text{ bits integer}}\cdot2^{\backslash\#\text{ bits decimal}}=2^{10+30}=2^{40}
+$$
 
-Indeed, suppose we are at a given level l, so the modulo is ql. We have a ciphertext c∈R2ql. Then we can define the rescaling operation from level l to l−1 as:  
-事实上，假设我们处于给定的级别 l ，那么模数是 ql 。我们有密文 c∈R2ql 。然后，我们可以将从级别 l 到 l−1 的重新缩放操作定义为：
 
-RSl→l−1(c)\=⌊ql−1ql⋅c⌉modql−1\=⌊Δ−1⋅c⌉modql−1
+一旦我们设定好了对整数部分和小数部分所需的精度，选择了我们要执行的乘法运算次数 $L$，并相应地设定了 $q$，定义重缩放操作就变得相当简单了：我们只需对密文进行除法并取整即可。
 
-because ql\=Δl⋅q0.  
-因为 ql\=Δl⋅q0 。
-
-So by doing so, there are two things we manage to do:  
+的确，假设我们处于给定的层级 $l$，因此模数为 $q_l$。我们有一个密文$c\in\mathcal{R}_{q_l}^2.$。那么我们可以将从层级 $l$ 到 $l−1$ 的重缩放操作定义为：
+$$
+RS_{l\to l-1}(c)=\left\lfloor\frac{q_{l-1}}{q_l}\cdot c\right\rceil\quad\mathrm{mod}q_{l-1}=\left\lfloor\Delta^{-1}\cdot c\right\rceil\quad\mathrm{mod}q_{l-1}
+$$
+因为$q=\Delta^L\cdot q_0$  
 因此，通过这样做，我们可以做两件事：
 
-- Once we decrypt the product of two ciphertexts c,c′, with underlying values Δ.z,Δ.z′, after applying rescaling we have Δ.z.z′. Therefore the scale remains constant throughout our computations as long as we rescale after each multiplication.  
-  一旦我们解密了两个密文 c,c′ 的乘积，其底层值为 Δ.z,Δ.z′ ，经过重新缩放后，我们得到 Δ.z.z′ 。因此，只要我们在每次乘法后重新缩放，缩放比例在整个计算过程中就保持不变。
-- The noise is reduced, because we divide both the underlying plaintext values, but also the noisy part of the decryption, which is of the form μ+e if you remember well. Therefore rescaling also serves the purpose of noise reduction.  
-  噪声降低了，因为我们不仅对底层明文值进行了除法运算，还对解密结果中的噪声部分进行了除法运算，如果你没记错的话，噪声部分的形式是 μ+e 。因此，重新缩放也起到了降低噪声的作用。
+- 一旦我们解密两个密文 $c、c^\prime$的乘积（其对应的基础值为 $Δ.z$、 $Δ.z′$），在应用重缩放后，我们会得到 $Δ.z.z^\prime$。因此，只要在每次乘法后进行重缩放，计算过程中的规模就会保持不变。
 
-So if we put everything together, to actually do a multiplication in CKKS you need to do three things:  
+- 噪声会减少，因为我们既对基础明文值进行了除法运算，也对解密过程中的噪声部分进行了除法运算，如果你记性好的话，噪声部分的形式是 $μ + e$。因此，重新缩放也起到了降噪的作用。
+
 因此，如果我们把所有东西放在一起，要在 CKKS 中实际进行乘法，您需要做三件事：
 
-1.  Compute the product: cmult\=CMult(c,c′)\=(d0,d1,d2)  
-    计算乘积： cmult\=CMult(c,c′)\=(d0,d1,d2)
-2.  Relinearize it: crelin\=Relin((d0,d1,d2),evk)  重新线性化： crelin\=Relin((d0,d1,d2),evk)
-3.  Rescale it: crs\=RSl→l−1(c)  重新缩放： crs\=RSl→l−1(c)
-
-Once you do all this, decryption with the secret key will provide the right result and we are all set! Well, almost there, as there is one last detail we will have to cover.  
-完成所有这些操作后，使用密钥解密将提供正确的结果，一切就绪！好了，差不多了，还有最后一个细节需要讲解。
+1.  计算乘积： $c_{mult}=\mathrm{СМult}(c,c^{\prime})=(d_0,d_1,d_2)$
+2.  重新线性化：$c_{relin}=\mathrm{Relin}((d_0,d_1,d_2),evk)$
+3.  重新缩放： $c_{rs}=\mathrm{RS}_{l\to l-1}(c)$
+    完成所有这些操作后，使用密钥解密将提供正确的结果，一切就绪！好了，差不多了，还有最后一个细节需要讲解。
 
 ## Chinese remainder theorem
 
-中国剩余定理
+所以我们发现我们拥有了所需的一切，但存在一个技术问题：计算是在极大的数字上进行的！实际上，我们的运算都是在极大的模数$q_l=\Delta^l.q_0$下完成的。例如，假设我们希望小数部分有 $30$ 位精度，整数部分有 $10$ 位精度，还要进行 $10$ 次乘法运算。那么我们就会得到$q_L=\Delta^l.q_0=2^{30\times10+40}=2^{340}!$
 
-So we saw we had everything we needed, but there is one technical problem: computations are done on huge numbers! Indeed we have that operations are done with huge moduli ql\=Δl.q0. Imagine for instance we want 30 bits of precision for the decimal part, 10 for the integer part, and 10 multiplications. Then we have qL\=Δl.q0\=230×10+40\=2340!  
-看来我们已经拥有了所需的一切，但还有一个技术问题：计算是在巨大的数字上进行的！事实上，这些运算是用巨大的模数 ql\=Δl.q0 进行的。想象一下，例如，我们希望小数部分精度为 30 位，整数部分精度为 10 位，并进行 10 次乘法运算。那么我们就得到了 qL\=Δl.q0\=230×10+40\=2340 ！
+因为我们有时要处理庞大的多项式，比如那些均匀采样得到的多项式，一些计算在常规的 $64$ 位系统中无法进行，所以我们必须找到一种方法来使其可行。
 
-Because we handle sometimes huge polynomials, such as the uniformly sampled ones, some computations won’t fit in usual 64 bits systems so we have to find a way to make it work.  
-因为我们有时会处理巨大的多项式，例如均匀采样的多项式，所以某些计算不适合通常的 64 位系统，所以我们必须找到一种方法来使其发挥作用。
+这就是中国剩余定理的用武之地！该定理指出，如果我们有 $L$ 个互质的数$p_1,\ldots,p_L$，$p=\prod_{l=1}^Lp_l$，那么这个映射
+$$
+\mathbb{Z}/p\mathbb{Z}\to\mathbb{Z}/p_1\mathbb{Z}\times\cdots\times\mathbb{Z}/p_L\mathbb{Z}:x\left(\mathrm{~mod~}p\right)\mapsto\left(x\left(\mathrm{~mod~}p_1\right),\ldots,x\left(\mathrm{~mod~}p_L\right)\right)
+$$
 
-That’s where the [Chinese remainder theorem](https://en.wikipedia.org/wiki/Chinese_remainder_theorem) comes in! This theorem states that if we have L coprime numbers p1,…,pL, p\=∏Ll\=1pl their product, then the map  
-这就是中国剩余定理的用武之地！该定理指出，如果我们有 L 个互质数， p1,…,pL ， p\=∏Ll\=1pl 个它们的乘积，那么映射  
-Z/pZ→Z/p1Z×⋯×Z/pLZ:x ( mod p)↦(x ( mod p1),…,x ( mod pL))  
-is a ring isomorphism, i.e. if you want to perform arithmetic on the “big” ring Z/pZ, you could instead perform it independently on the “small” rings Z/plZ where you will not have the problem of performing computation on more than 64 bits.  
-是环同构，即如果您想在“大”环 Z/pZ 上执行算术运算，那么您可以在“小”环 Z/plZ 上独立执行该运算，这样就不会遇到在超过 64 位上执行计算的问题。
 
-So in practice, instead of having qL\=ΔL.q0, we first choose p1,…,pL,q0 prime numbers, with each pl≈Δ and q0 a prime number greater than Δ depending on the integer precision desired, then set qL\=∏Ll\=1pl⋅q0.  
-因此在实践中，我们首先选择 p1,…,pL,q0 个素数，而不是 qL\=ΔL.q0 ，其中 pl≈Δ 和 q0 均为大于 Δ 的素数，具体取决于所需的整数精度，然后设置 qL\=∏Ll\=1pl⋅q0 。
+是一个环同构，也就是说，如果你想在“大”环$\mathbb{Z}/p\mathbb{Z}$上进行算术运算，你可以转而在“小”环$\mathbb{Z}/p_l\mathbb{Z}$上独立地进行运算，在这些小环上你不会遇到需要在超过 $64$ 位上进行计算的问题。
 
-This way, we can use the Chinese remainder theorem, and do the little trick described above to be able to perform arithmetic with big modulo. The rescaling operation has to be slightly modified:  
-这样，我们就可以利用中国剩余定理，并运用上面提到的小技巧，进行大模运算。缩放操作需要稍微修改一下：  
-RSl→l−1(c)\=⌊ql−1qlc⌉ (mod ql−1)\=⌊p−1lc⌉ (mod ql−1)
+因此，在实际操作中，我们并非令$q_l=\Delta^l.q_0$，而是首先选择$p_1,\ldots,p_L$，$q_0$这些质数，其中每个 $p_l≈Δ$，而 $q_0$ 是一个大于 $Δ$ 的质数，其大小取决于所需的整数精度，然后令$q_L=\prod_{l=1}^Lp_l\cdot q_0$。
 
-So we have seen in this article what is rescaling, why we need it, and how one could implement it in practice. In the next and last article we will put everything together and code a CKKS-like homomorphic encryption scheme ourselves in Python!  
-我们已经在本文中了解了什么是重新缩放，为什么需要它，以及如何在实践中实现它。在下一篇也是最后一篇文章中，我们将把所有内容整合在一起，并用 Python 编写一个类似 CKKS 的同态加密方案！
+这样一来，我们就可以运用中国剩余定理，并采用上述的小技巧来进行大模运算。不过，重新缩放操作需要稍作修改：  
+$$
+RS_{l\to l-1}(c)=\left\lfloor\frac{q_{l-1}}{q_l}c\right\rceil({\mathrm{mod}}q_{l-1})=\left\lfloor p_l^{-1}c\right\rceil({\mathrm{mod}}q_{l-1})
+$$
+
 
